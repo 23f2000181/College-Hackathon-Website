@@ -2,7 +2,7 @@
    HackVerse — Team Details Page Logic
    ═══════════════════════════════════════════════ */
 
-import { requireAuth, getSelectedPS, initAppNav, DEPT_NAMES } from '/js/shared.js';
+import { requireAuth, getTeamData, getSelectedPS, initAppNav, DEPT_NAMES } from '/js/shared.js';
 
 const session = requireAuth();
 if (session) {
@@ -14,6 +14,7 @@ if (session) {
   document.getElementById('leader-email').textContent = session.email;
   document.getElementById('leader-phone').textContent = session.phone || '—';
   document.getElementById('leader-dept').textContent = DEPT_NAMES[session.department] || session.departmentLabel;
+  document.getElementById('leader-dept-full').textContent = DEPT_NAMES[session.department] || session.departmentLabel;
 
   const leaderAvatar = document.getElementById('leader-avatar');
   if (leaderAvatar) {
@@ -25,8 +26,20 @@ if (session) {
       .slice(0, 2);
   }
 
+  // Fetch full team data from Supabase for registered date
+  async function loadTeamData() {
+    const team = await getTeamData(session.teamId);
+    if (team && team.registered_at) {
+      const d = new Date(team.registered_at);
+      document.getElementById('leader-date').textContent = d.toLocaleDateString('en-IN', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      });
+    }
+  }
+  loadTeamData();
+
   // Team roster (from session)
-  const rosterEl = document.getElementById('team-roster');
+  const rosterEl = document.getElementById('roster-list');
   const colors = [
     'linear-gradient(135deg, #FF00E4, #33CCFF)',
     'linear-gradient(135deg, #33CCFF, #FFD700)',
@@ -52,28 +65,26 @@ if (session) {
   // Selected PS (async from Supabase)
   async function loadSelectedPS() {
     const ps = await getSelectedPS(session.teamId);
-    const psSection = document.getElementById('selected-ps-section');
+    const noPS = document.getElementById('no-ps');
+    const psDetail = document.getElementById('selected-ps-detail');
     const psTitle = document.getElementById('ps-title');
     const psDesc = document.getElementById('ps-desc');
-    const psBadge = document.getElementById('ps-badge');
+    const psBadge = document.getElementById('ps-diff-badge');
+    const psId = document.getElementById('ps-id');
 
     if (ps) {
+      if (noPS) noPS.style.display = 'none';
+      if (psDetail) psDetail.style.display = '';
       if (psTitle) psTitle.textContent = ps.title;
       if (psDesc) psDesc.textContent = ps.description;
+      if (psId) psId.textContent = ps.id;
       if (psBadge) {
         psBadge.textContent = ps.difficulty;
-        psBadge.className = `badge badge-${ps.difficulty.toLowerCase()}`;
+        psBadge.className = `ps-selected-tag badge-${ps.difficulty.toLowerCase()}`;
       }
-      if (psSection) psSection.style.display = '';
     } else {
-      if (psSection) {
-        psSection.innerHTML = `
-          <div style="text-align:center; padding: 40px; color: var(--text-tertiary);">
-            <p>No problem statement selected yet.</p>
-            <a href="/pages/problems.html" style="color: var(--accent-cyan); text-decoration: underline; margin-top: 8px; display: inline-block;">Browse Problem Statements →</a>
-          </div>
-        `;
-      }
+      if (noPS) noPS.style.display = '';
+      if (psDetail) psDetail.style.display = 'none';
     }
   }
 

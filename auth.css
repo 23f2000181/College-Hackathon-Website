@@ -112,7 +112,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 .side-logo {
-  font-size: 2.2rem;
+  font-size: 1.2rem;
   font-weight: 800;
   margin-bottom: 24px;
   display: inline-flex;
@@ -127,13 +127,13 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
-.side-logo .logo-hack { color: var(--text-primary); }
-.side-logo .logo-verse {
-  background: var(--gradient-pink-cyan);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.side-logo .logo-text-group {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
 }
+.side-logo .logo-main { font-size: 1.2rem; font-weight: 900; color: #ffffff; letter-spacing: 0.08em; }
+.side-logo .logo-sub { font-size: 0.65rem; font-weight: 600; color: rgba(255, 255, 255, 0.85); letter-spacing: 0.12em; }
 
 .side-tagline {
   font-size: 1.8rem;
