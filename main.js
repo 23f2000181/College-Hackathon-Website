@@ -5,6 +5,7 @@
 
 import * as THREE from 'three';
 import gsap from 'gsap';
+import { supabase } from '/js/supabase.js';
 
 // ─── THREE.JS 3D HERO SCENE ───
 class HeroScene {
@@ -530,8 +531,77 @@ function initSectionLabels() {
   labels.forEach((label) => observer.observe(label));
 }
 
+// ─── DYNAMIC STATS FROM SUPABASE ───
+async function loadDynamicStats() {
+  try {
+    // Fetch team count
+    const { count: teamCount } = await supabase
+      .from('teams')
+      .select('*', { count: 'exact', head: true });
+
+    // Update participants stat (teams * 4)
+    const participantEl = document.getElementById('stat-participants');
+    if (participantEl && teamCount !== null) {
+      participantEl.dataset.count = teamCount * 4;
+    }
+
+    // Fetch PS counts per department
+    const { data: allPS } = await supabase
+      .from('problem_statements')
+      .select('department');
+
+    if (allPS) {
+      // Count per dept
+      const deptCounts = {};
+      allPS.forEach((ps) => {
+        deptCounts[ps.department] = (deptCounts[ps.department] || 0) + 1;
+      });
+
+      // Update department cards
+      document.querySelectorAll('.dept-problems[data-dept]').forEach((el) => {
+        const dept = el.dataset.dept;
+        const count = deptCounts[dept] || 0;
+        el.textContent = `${count} Problem${count !== 1 ? 's' : ''}`;
+      });
+
+      // Update total PS stat in hero
+      const psEl = document.getElementById('stat-ps');
+      if (psEl) {
+        psEl.dataset.count = allPS.length;
+      }
+    }
+  } catch (e) {
+    // Fallback: just show static values
+    document.querySelectorAll('.dept-problems[data-dept]').forEach((el) => {
+      el.textContent = '5 Problems';
+    });
+  }
+}
+
+// ─── SCROLL SPY — HIGHLIGHT ACTIVE NAV LINK ───
+function initScrollSpy() {
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links .nav-link');
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          navLinks.forEach((link) => link.classList.remove('active'));
+          const activeLink = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+          if (activeLink) activeLink.classList.add('active');
+        }
+      });
+    },
+    { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
+  );
+
+  sections.forEach((section) => observer.observe(section));
+}
+
 // ─── INITIALIZE EVERYTHING ───
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadDynamicStats();
   new HeroScene();
   initNavbar();
   initScrollReveal();
@@ -540,4 +610,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initHeroAnimation();
   initCardTilt();
   initSectionLabels();
+  initScrollSpy();
 });
+

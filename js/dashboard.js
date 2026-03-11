@@ -1,51 +1,54 @@
 /* ═══════════════════════════════════════════════
-   HackVerse — Dashboard Logic (refactored)
+   HackVerse — Dashboard Logic
    ═══════════════════════════════════════════════ */
 
-import { requireAuth, getTeamData, getSelectedPS, initAppNav, DEPT_NAMES } from '/js/shared.js';
+import { requireAuth, getSelectedPS, initAppNav, DEPT_NAMES } from '/js/shared.js';
 
 const session = requireAuth();
 if (session) {
-  const team = getTeamData(session);
-
   initAppNav(session);
 
   // Welcome
   document.getElementById('welcome-name').textContent = session.leaderName.split(' ')[0];
   document.getElementById('welcome-dept').textContent = DEPT_NAMES[session.department] || session.departmentLabel;
 
-  // Check selected PS
-  const selectedPS = getSelectedPS(session.teamId);
-  if (selectedPS) {
-    document.getElementById('ps-status').textContent = 'Selected';
-    document.getElementById('ps-status').style.color = 'var(--accent-green)';
+  // Async data loading
+  async function loadDashboardData() {
+    const selectedPS = await getSelectedPS(session.teamId);
 
-    // Timeline
-    const stepPS = document.getElementById('step-ps');
-    if (stepPS) {
-      stepPS.classList.add('completed');
-      const badge = document.getElementById('ps-badge');
-      if (badge) { badge.textContent = '✓'; badge.className = 'timeline-check'; }
-      const desc = document.getElementById('ps-desc');
-      if (desc) desc.textContent = selectedPS.title;
-    }
+    if (selectedPS) {
+      document.getElementById('ps-status').textContent = 'Selected';
+      document.getElementById('ps-status').style.color = 'var(--accent-green)';
 
-    const stepSubmit = document.getElementById('step-submit');
-    if (stepSubmit) {
-      stepSubmit.classList.add('active');
-      const sBadge = stepSubmit.querySelector('.timeline-status');
-      if (sBadge) { sBadge.textContent = 'In Progress'; sBadge.classList.add('active-badge'); }
-    }
+      // Timeline
+      const stepPS = document.getElementById('step-ps');
+      if (stepPS) {
+        stepPS.classList.add('completed');
+        const badge = document.getElementById('ps-badge');
+        if (badge) { badge.textContent = '✓'; badge.className = 'timeline-check'; }
+        const desc = document.getElementById('ps-desc');
+        if (desc) desc.textContent = selectedPS.title;
+      }
 
-    const psCard = document.getElementById('selected-ps');
-    if (psCard) {
-      psCard.style.display = 'block';
-      document.getElementById('chosen-ps-title').textContent = selectedPS.title;
-      document.getElementById('chosen-ps-dept').textContent = selectedPS.department;
+      const stepSubmit = document.getElementById('step-submit');
+      if (stepSubmit) {
+        stepSubmit.classList.add('active');
+        const sBadge = stepSubmit.querySelector('.timeline-status');
+        if (sBadge) { sBadge.textContent = 'In Progress'; sBadge.classList.add('active-badge'); }
+      }
+
+      const psCard = document.getElementById('selected-ps');
+      if (psCard) {
+        psCard.style.display = 'block';
+        document.getElementById('chosen-ps-title').textContent = selectedPS.title;
+        document.getElementById('chosen-ps-dept').textContent = DEPT_NAMES[selectedPS.department] || selectedPS.department;
+      }
     }
   }
 
-  // Team list
+  loadDashboardData();
+
+  // Team list (from session — members stored at login)
   const teamList = document.getElementById('team-list');
   const colors = [
     'linear-gradient(135deg, #FF00E4, #33CCFF)',
@@ -54,8 +57,8 @@ if (session) {
     'linear-gradient(135deg, #00E49F, #A855F7)',
   ];
 
-  if (team && team.members && teamList) {
-    team.members.forEach((name, i) => {
+  if (session.members && teamList) {
+    session.members.forEach((name, i) => {
       const row = document.createElement('div');
       row.className = 'team-member-row';
       row.innerHTML = `
@@ -74,11 +77,8 @@ if (session) {
   const panelEmail = document.getElementById('panel-email');
   if (panelEmail) panelEmail.textContent = session.email;
 
-  if (team && team.registeredAt) {
-    const d = new Date(team.registeredAt);
-    const panelDate = document.getElementById('panel-date');
-    if (panelDate) panelDate.textContent = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
+  const panelDate = document.getElementById('panel-date');
+  if (panelDate) panelDate.textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
   // Ambient particles
   function initParticles() {

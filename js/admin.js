@@ -2,7 +2,8 @@
    HackVerse — Admin Panel Logic
    ═══════════════════════════════════════════════ */
 
-import { PROBLEM_STATEMENTS, DEPT_NAMES, getSelectedPS } from '/js/shared.js';
+import { supabase } from '/js/supabase.js';
+import { DEPT_NAMES } from '/js/shared.js';
 
 // ─── AUTH GUARD ───
 const session = JSON.parse(localStorage.getItem('hackverse_session') || 'null');
@@ -17,25 +18,6 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 });
 
 // ─── HELPERS ───
-function getTeams() {
-  return JSON.parse(localStorage.getItem('hackverse_teams') || '[]');
-}
-
-function getCustomPS() {
-  return JSON.parse(localStorage.getItem('hackverse_custom_ps') || 'null');
-}
-
-function saveCustomPS(data) {
-  localStorage.setItem('hackverse_custom_ps', JSON.stringify(data));
-}
-
-function getAllPS() {
-  const custom = getCustomPS();
-  if (custom) return custom;
-  // Deep clone the defaults
-  return JSON.parse(JSON.stringify(PROBLEM_STATEMENTS));
-}
-
 function formatDate(iso) {
   if (!iso) return '—';
   const d = new Date(iso);
@@ -53,7 +35,6 @@ tabs.forEach((tab) => {
     tab.classList.add('active');
     document.getElementById('panel-' + tab.dataset.tab).classList.remove('hidden');
 
-    // Re-render tab content
     if (tab.dataset.tab === 'overview') renderOverview();
     if (tab.dataset.tab === 'registrations') renderRegistrations();
     if (tab.dataset.tab === 'problems') renderPSList();
@@ -63,29 +44,33 @@ tabs.forEach((tab) => {
 // ═════════════════════════════════════════
 //  OVERVIEW TAB
 // ═════════════════════════════════════════
-function renderOverview() {
-  const teams = getTeams();
-  const allPS = getAllPS();
+async function renderOverview() {
+  // Fetch teams
+  const { data: teams } = await supabase
+    .from('teams')
+    .select('*')
+    .order('registered_at', { ascending: false });
+
+  const allTeams = teams || [];
+
+  // Fetch PS stats
+  const { data: allPS } = await supabase
+    .from('problem_statements')
+    .select('id, selected_by');
+
+  const psList = allPS || [];
+  const psSelectedCount = psList.filter((p) => p.selected_by).length;
 
   // Stats
-  document.getElementById('stat-teams').textContent = teams.length;
-  document.getElementById('stat-participants').textContent = teams.length * 4;
-
-  let psSelectedCount = 0;
-  teams.forEach((t) => {
-    const ps = getSelectedPS(t.id);
-    if (ps) psSelectedCount++;
-  });
+  document.getElementById('stat-teams').textContent = allTeams.length;
+  document.getElementById('stat-participants').textContent = allTeams.length * 4;
   document.getElementById('stat-ps-selected').textContent = psSelectedCount;
-
-  let totalPS = 0;
-  Object.values(allPS).forEach((arr) => (totalPS += arr.length));
-  document.getElementById('stat-total-ps').textContent = totalPS;
+  document.getElementById('stat-total-ps').textContent = psList.length;
 
   // Dept breakdown
   const deptCounts = {};
   Object.keys(DEPT_NAMES).forEach((k) => (deptCounts[k] = 0));
-  teams.forEach((t) => {
+  allTeams.forEach((t) => {
     if (deptCounts[t.department] !== undefined) deptCounts[t.department]++;
   });
 
@@ -97,7 +82,6 @@ function renderOverview() {
   Object.entries(DEPT_NAMES).forEach(([key, name], i) => {
     const count = deptCounts[key] || 0;
     const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
-
     const row = document.createElement('div');
     row.className = 'dept-bar-row';
     row.innerHTML = `
@@ -115,21 +99,20 @@ function renderOverview() {
   const recentEmpty = document.getElementById('recent-empty');
   recentBody.innerHTML = '';
 
-  if (teams.length === 0) {
+  if (allTeams.length === 0) {
     recentEmpty.style.display = 'block';
     document.getElementById('recent-table').style.display = 'none';
   } else {
     recentEmpty.style.display = 'none';
     document.getElementById('recent-table').style.display = '';
 
-    const recent = [...teams].sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt)).slice(0, 5);
-    recent.forEach((team) => {
+    allTeams.slice(0, 5).forEach((team) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td class="leader-cell">${team.leaderName}</td>
+        <td class="leader-cell">${team.leader_name}</td>
         <td>${DEPT_NAMES[team.department] || team.department}</td>
-        <td>${team.members ? team.members.length : 0}</td>
-        <td>${formatDate(team.registeredAt)}</td>
+        <td>4</td>
+        <td>${formatDate(team.registered_at)}</td>
       `;
       recentBody.appendChild(tr);
     });
@@ -152,24 +135,49 @@ document.getElementById('filter-dept').addEventListener('change', (e) => {
   renderRegistrations();
 });
 
-function renderRegistrations() {
-  const teams = getTeams();
+async function renderRegistrations() {
+  let query = supabase.from('teams').select('*').order('registered_at', { ascending: false });
+
+  if (filterDept !== 'all') {
+    query = query.eq('department', filterDept);
+  }
+
+  const { data: teams } = await query;
+  const allTeams = teams || [];
+
+  // Also fetch all PS to show selected status
+  const { data: allPS } = await supabase
+    .from('problem_statements')
+    .select('id, title, selected_by');
+
+  // Also fetch all members
+  const { data: allMembers } = await supabase
+    .from('team_members')
+    .select('team_id, member_name, member_index')
+    .order('member_index');
+
+  const psByTeam = {};
+  (allPS || []).forEach((ps) => {
+    if (ps.selected_by) psByTeam[ps.selected_by] = ps;
+  });
+
+  const membersByTeam = {};
+  (allMembers || []).forEach((m) => {
+    if (!membersByTeam[m.team_id]) membersByTeam[m.team_id] = [];
+    membersByTeam[m.team_id].push(m.member_name);
+  });
+
   const tbody = document.getElementById('registrations-body');
   const emptyEl = document.getElementById('registrations-empty');
   const table = document.getElementById('registrations-table');
   tbody.innerHTML = '';
 
-  let filtered = teams;
-
-  // Filter by dept
-  if (filterDept !== 'all') {
-    filtered = filtered.filter((t) => t.department === filterDept);
-  }
-
-  // Search
+  // Search filter
+  let filtered = allTeams;
   if (searchQuery) {
     filtered = filtered.filter((t) => {
-      const searchable = `${t.leaderName} ${t.usn} ${t.email} ${t.phone} ${(t.members || []).join(' ')}`.toLowerCase();
+      const members = membersByTeam[t.id] || [];
+      const searchable = `${t.leader_name} ${t.usn} ${t.email} ${t.phone} ${members.join(' ')}`.toLowerCase();
       return searchable.includes(searchQuery);
     });
   }
@@ -184,18 +192,19 @@ function renderRegistrations() {
   table.style.display = '';
 
   filtered.forEach((team, i) => {
-    const ps = getSelectedPS(team.id);
+    const ps = psByTeam[team.id];
+    const members = membersByTeam[team.id] || [];
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i + 1}</td>
-      <td class="leader-cell">${team.leaderName}</td>
+      <td class="leader-cell">${team.leader_name}</td>
       <td>${team.usn || '—'}</td>
       <td>${team.email}</td>
       <td>${team.phone || '—'}</td>
       <td>${DEPT_NAMES[team.department] || team.department}</td>
-      <td class="members-cell">${team.members ? team.members.join(', ') : '—'}</td>
+      <td class="members-cell">${members.join(', ') || '—'}</td>
       <td class="ps-cell">${ps ? `<span class="ps-tag selected">${ps.title}</span>` : '<span class="ps-tag pending">Not selected</span>'}</td>
-      <td>${formatDate(team.registeredAt)}</td>
+      <td>${formatDate(team.registered_at)}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -217,19 +226,28 @@ document.getElementById('ps-dept-chips').addEventListener('click', (e) => {
 });
 
 // Add PS
-document.getElementById('btn-add-ps').addEventListener('click', () => {
+document.getElementById('btn-add-ps').addEventListener('click', async () => {
   const title = document.getElementById('new-ps-title').value.trim();
   const desc = document.getElementById('new-ps-desc').value.trim();
   const diff = document.getElementById('new-ps-diff').value;
 
   if (!title) return;
 
-  const allPS = getAllPS();
-  if (!allPS[activeDept]) allPS[activeDept] = [];
-
   const id = `${activeDept}-${Date.now()}`;
-  allPS[activeDept].push({ id, title, desc: desc || 'No description provided.', difficulty: diff });
-  saveCustomPS(allPS);
+  const { error } = await supabase
+    .from('problem_statements')
+    .insert({
+      id,
+      department: activeDept,
+      title,
+      description: desc || 'No description provided.',
+      difficulty: diff,
+    });
+
+  if (error) {
+    alert('Error adding PS: ' + error.message);
+    return;
+  }
 
   // Clear form
   document.getElementById('new-ps-title').value = '';
@@ -240,21 +258,19 @@ document.getElementById('btn-add-ps').addEventListener('click', () => {
   renderOverview();
 });
 
-function renderPSList() {
-  const allPS = getAllPS();
-  const problems = allPS[activeDept] || [];
+async function renderPSList() {
+  const { data: problems } = await supabase
+    .from('problem_statements')
+    .select('*, teams:selected_by(leader_name)')
+    .eq('department', activeDept)
+    .order('id');
+
   const psList = document.getElementById('ps-list');
   psList.innerHTML = '';
 
-  // Find which PS are taken
-  const teams = getTeams();
-  const takenMap = {};
-  teams.forEach((team) => {
-    const ps = getSelectedPS(team.id);
-    if (ps) takenMap[ps.id] = team.leaderName;
-  });
+  const items = problems || [];
 
-  if (problems.length === 0) {
+  if (items.length === 0) {
     psList.innerHTML = `
       <div style="text-align:center; padding: 40px; color: var(--text-tertiary);">
         <p>No problem statements for this department yet.</p>
@@ -263,8 +279,8 @@ function renderPSList() {
     return;
   }
 
-  problems.forEach((ps, i) => {
-    const isTaken = takenMap[ps.id];
+  items.forEach((ps, i) => {
+    const takenBy = ps.teams?.leader_name;
     const item = document.createElement('div');
     item.className = 'ps-item';
 
@@ -274,11 +290,11 @@ function renderPSList() {
       <div class="ps-item-number">${String(i + 1).padStart(2, '0')}</div>
       <div class="ps-item-body">
         <div class="ps-item-title">${ps.title}</div>
-        <div class="ps-item-desc">${ps.desc}</div>
+        <div class="ps-item-desc">${ps.description}</div>
       </div>
       <div class="ps-item-meta">
         <span class="badge ${diffBadge}">${ps.difficulty}</span>
-        ${isTaken ? `<span class="ps-taken-tag">Taken by ${isTaken}</span>` : ''}
+        ${takenBy ? `<span class="ps-taken-tag">Taken by ${takenBy}</span>` : ''}
         <button class="btn-delete-ps" data-id="${ps.id}" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
@@ -290,12 +306,14 @@ function renderPSList() {
 
   // Delete handlers
   psList.querySelectorAll('.btn-delete-ps').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      const allPS = getAllPS();
-      if (allPS[activeDept]) {
-        allPS[activeDept] = allPS[activeDept].filter((p) => p.id !== id);
-        saveCustomPS(allPS);
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this problem statement?')) return;
+      const { error } = await supabase
+        .from('problem_statements')
+        .delete()
+        .eq('id', btn.dataset.id);
+
+      if (!error) {
         renderPSList();
         renderOverview();
       }

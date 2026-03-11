@@ -2,6 +2,8 @@
    HackVerse — Login Page Logic
    ═══════════════════════════════════════════════ */
 
+import { supabase } from '/js/supabase.js';
+
 // ─── DOM ELEMENTS ───
 const form = document.getElementById('login-form');
 const emailInput = document.getElementById('email');
@@ -84,9 +86,6 @@ form.addEventListener('submit', async (e) => {
   submitBtn.classList.add('loading');
   submitBtn.disabled = true;
 
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 1200));
-
   // ─── ADMIN LOGIN CHECK ───
   const ADMIN_EMAIL = 'admin@hackverse.com';
   const ADMIN_PASSWORD = 'hackverse2026';
@@ -112,37 +111,50 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Look up team in localStorage
-  const teams = JSON.parse(localStorage.getItem('hackverse_teams') || '[]');
-  const team = teams.find(
-    (t) => t.email.toLowerCase() === email && t.password === passwordInput.value
-  );
+  // ─── TEAM LOGIN VIA SUPABASE ───
+  const { data: team, error } = await supabase
+    .from('teams')
+    .select('*')
+    .eq('email', email)
+    .eq('password', passwordInput.value)
+    .maybeSingle();
 
   submitBtn.classList.remove('loading');
   submitBtn.disabled = false;
 
-  if (!team) {
+  if (error || !team) {
     showError('email', 'email-error', 'Invalid email or password');
     showError('password', 'password-error', 'Invalid email or password');
     showToast('Invalid email or password', 'error');
     return;
   }
 
+  // Fetch team members
+  const { data: membersData } = await supabase
+    .from('team_members')
+    .select('member_name, member_index')
+    .eq('team_id', team.id)
+    .order('member_index');
+
+  const members = membersData ? membersData.map((m) => m.member_name) : [];
+
   // Login success — store session info
   localStorage.setItem(
     'hackverse_session',
     JSON.stringify({
       teamId: team.id,
-      leaderName: team.leaderName,
+      leaderName: team.leader_name,
       email: team.email,
       department: team.department,
-      departmentLabel: team.departmentLabel,
-      members: team.members,
+      departmentLabel: team.department_label,
+      usn: team.usn,
+      phone: team.phone,
+      members: members,
       loggedInAt: new Date().toISOString(),
     })
   );
 
-  showToast(`Welcome back, ${team.leaderName}!`, 'success');
+  showToast(`Welcome back, ${team.leader_name}!`, 'success');
 
   // Redirect to dashboard
   setTimeout(() => {

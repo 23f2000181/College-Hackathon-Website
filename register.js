@@ -184,10 +184,16 @@ function showToast(message, type = 'success') {
   }, 4000);
 }
 
-// ─── CHECK IF EMAIL ALREADY REGISTERED ───
-function isEmailRegistered(email) {
-  const teams = JSON.parse(localStorage.getItem('hackverse_teams') || '[]');
-  return teams.some((team) => team.email.toLowerCase() === email.toLowerCase());
+// ─── CHECK IF EMAIL ALREADY REGISTERED (Supabase) ───
+import { supabase } from '/js/supabase.js';
+
+async function isEmailRegistered(email) {
+  const { data } = await supabase
+    .from('teams')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .maybeSingle();
+  return !!data;
 }
 
 // ─── FORM SUBMISSION ───
@@ -199,44 +205,67 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Check if email already exists
-  if (isEmailRegistered(emailInput.value.trim())) {
+  // Show loading state
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+
+  // Check if email already exists in Supabase
+  const emailTaken = await isEmailRegistered(emailInput.value.trim());
+  if (emailTaken) {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
     showError('email', 'email-error');
     document.getElementById('email-error').textContent = 'This email is already registered';
     showToast('This email is already registered', 'error');
     return;
   }
 
-  // Show loading state
-  submitBtn.classList.add('loading');
-  submitBtn.disabled = true;
+  // Insert team into Supabase
+  const { data: team, error: teamError } = await supabase
+    .from('teams')
+    .insert({
+      leader_name: leaderNameInput.value.trim(),
+      usn: usnInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      email: emailInput.value.trim().toLowerCase(),
+      department: departmentSelect.value,
+      department_label: departmentSelect.options[departmentSelect.selectedIndex].text,
+      password: passwordInput.value,
+    })
+    .select()
+    .single();
 
-  // Simulate network delay (will be replaced with Supabase later)
-  await new Promise((resolve) => setTimeout(resolve, 1500));
+  if (teamError) {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    showToast('Registration failed: ' + teamError.message, 'error');
+    return;
+  }
 
-  // Build team data
-  const teamData = {
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
-    leaderName: leaderNameInput.value.trim(),
-    usn: usnInput.value.trim(),
-    phone: phoneInput.value.trim(),
-    email: emailInput.value.trim().toLowerCase(),
-    department: departmentSelect.value,
-    departmentLabel: departmentSelect.options[departmentSelect.selectedIndex].text,
-    password: passwordInput.value, // In production, this will be hashed via Supabase Auth
-    members: [
-      member1Input.value.trim(),
-      member2Input.value.trim(),
-      member3Input.value.trim(),
-      member4Input.value.trim(),
-    ],
-    registeredAt: new Date().toISOString(),
-  };
+  // Insert team members
+  const members = [
+    member1Input.value.trim(),
+    member2Input.value.trim(),
+    member3Input.value.trim(),
+    member4Input.value.trim(),
+  ];
 
-  // Save to localStorage
-  const teams = JSON.parse(localStorage.getItem('hackverse_teams') || '[]');
-  teams.push(teamData);
-  localStorage.setItem('hackverse_teams', JSON.stringify(teams));
+  const memberRows = members.map((name, i) => ({
+    team_id: team.id,
+    member_name: name,
+    member_index: i + 1,
+  }));
+
+  const { error: membersError } = await supabase
+    .from('team_members')
+    .insert(memberRows);
+
+  if (membersError) {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    showToast('Error saving team members: ' + membersError.message, 'error');
+    return;
+  }
 
   // Reset loading
   submitBtn.classList.remove('loading');
