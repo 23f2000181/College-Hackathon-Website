@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Details — HackVerse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/team.css" />
+</head>
+<body>
+  <!-- ─── NAV ─── -->
+  <nav class="app-nav">
+    <a href="/" class="app-logo"><span class="logo-hack">Hack</span><span class="logo-verse">Verse</span></a>
+    <div class="app-nav-center">
+      <a href="/pages/dashboard.html" class="app-nav-link">Dashboard</a>
+      <a href="/pages/problems.html" class="app-nav-link">Problems</a>
+      <a href="/pages/team.html" class="app-nav-link active">Team</a>
+      <a href="/pages/progress.html" class="app-nav-link">Progress</a>
+    </div>
+    <div class="app-nav-right">
+      <div class="nav-user-info">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+        <div style="display:flex;flex-direction:column;">
+          <span class="nav-user-name" id="nav-user-name">—</span>
+          <span class="nav-user-dept" id="nav-user-dept"></span>
+        </div>
+      </div>
+      <button class="btn-logout" id="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── PAGE ─── -->
+  <main class="page-container">
+    <div class="page-header fade-in">
+      <div class="page-breadcrumb">
+        <a href="/pages/dashboard.html">Dashboard</a>
+        <span class="sep">›</span>
+        <span>Team Details</span>
+      </div>
+      <h1 class="page-title">Your <span class="gradient-text">Team</span></h1>
+      <p class="page-subtitle">View your registration details, team roster, and selected problem statement.</p>
+    </div>
+
+    <div class="team-layout">
+      <!-- Leader Info Card -->
+      <div class="app-card fade-in stagger-1" id="leader-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Team Leader
+          </h2>
+          <span class="badge badge-active">Leader</span>
+        </div>
+        <div class="leader-profile">
+          <div class="leader-avatar" id="leader-avatar">?</div>
+          <div class="leader-info">
+            <h3 class="leader-name" id="leader-name">—</h3>
+            <span class="leader-dept" id="leader-dept">—</span>
+          </div>
+        </div>
+        <div class="leader-details">
+          <div class="info-row">
+            <span class="info-label">USN</span>
+            <span class="info-value" id="leader-usn">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value" id="leader-email">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value" id="leader-phone">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Department</span>
+            <span class="info-value" id="leader-dept-full">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Registered On</span>
+            <span class="info-value" id="leader-date">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Team Roster Card -->
+      <div class="app-card fade-in stagger-2" id="roster-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Team Roster
+          </h2>
+          <span class="badge badge-selected" id="team-count-badge">4 Members</span>
+        </div>
+        <div class="roster-list" id="roster-list">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Selected Problem Statement -->
+      <div class="app-card fade-in stagger-3 full-width" id="ps-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Selected Problem Statement
+          </h2>
+        </div>
+        <div id="ps-content">
+          <div class="no-ps" id="no-ps">
+            <span class="no-ps-icon">📋</span>
+            <h3>No Problem Statement Selected Yet</h3>
+            <p>Head over to the Problem Statements page to choose your challenge.</p>
+            <a href="/pages/problems.html" class="ps-cta-btn">Browse Problems →</a>
+          </div>
+          <div class="selected-ps-detail" id="selected-ps-detail" style="display:none;">
+            <div class="ps-selected-header">
+              <span class="ps-selected-tag" id="ps-diff-badge">—</span>
+              <span class="ps-selected-id" id="ps-id">—</span>
+            </div>
+            <h3 class="ps-selected-title" id="ps-title">—</h3>
+            <p class="ps-selected-desc" id="ps-desc">—</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/js/team.js"></script>
+</body>
+</html>

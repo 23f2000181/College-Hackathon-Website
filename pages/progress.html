@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Progress — HackVerse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/progress.css" />
+</head>
+<body>
+  <!-- ─── NAV ─── -->
+  <nav class="app-nav">
+    <a href="/" class="app-logo"><span class="logo-hack">Hack</span><span class="logo-verse">Verse</span></a>
+    <div class="app-nav-center">
+      <a href="/pages/dashboard.html" class="app-nav-link">Dashboard</a>
+      <a href="/pages/problems.html" class="app-nav-link">Problems</a>
+      <a href="/pages/team.html" class="app-nav-link">Team</a>
+      <a href="/pages/progress.html" class="app-nav-link active">Progress</a>
+    </div>
+    <div class="app-nav-right">
+      <div class="nav-user-info">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+        <div style="display:flex;flex-direction:column;">
+          <span class="nav-user-name" id="nav-user-name">—</span>
+          <span class="nav-user-dept" id="nav-user-dept"></span>
+        </div>
+      </div>
+      <button class="btn-logout" id="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── PAGE ─── -->
+  <main class="page-container">
+    <div class="page-header fade-in">
+      <div class="page-breadcrumb">
+        <a href="/pages/dashboard.html">Dashboard</a>
+        <span class="sep">›</span>
+        <span>Track Progress</span>
+      </div>
+      <h1 class="page-title">Your <span class="gradient-text">Journey</span></h1>
+      <p class="page-subtitle">Track your hackathon progress from registration to results.</p>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="progress-overview fade-in stagger-1">
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar" style="width: 20%;"></div>
+      </div>
+      <span class="progress-label" id="progress-label">1 of 5 milestones completed</span>
+    </div>
+
+    <!-- Timeline -->
+    <div class="progress-timeline fade-in stagger-2">
+      <!-- Step 1: Registered -->
+      <div class="progress-step completed" id="step-1">
+        <div class="step-connector"></div>
+        <div class="step-icon-wrap">
+          <div class="step-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>
+          </div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3 class="step-title">Team Registered</h3>
+            <span class="badge badge-selected">Completed</span>
+          </div>
+          <p class="step-desc">Your 4-member team has been successfully registered for HackVerse.</p>
+          <div class="step-meta" id="step-1-meta">
+            <span class="step-date" id="step-1-date">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: PS Selected -->
+      <div class="progress-step" id="step-2">
+        <div class="step-connector"></div>
+        <div class="step-icon-wrap">
+          <div class="step-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3 class="step-title">Problem Statement Selected</h3>
+            <span class="badge badge-pending" id="step-2-badge">Pending</span>
+          </div>
+          <p class="step-desc" id="step-2-desc">Browse and lock in your chosen problem statement to begin working.</p>
+          <div class="step-action" id="step-2-action">
+            <a href="/pages/problems.html" class="step-btn">Browse Problems →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Project Submitted -->
+      <div class="progress-step locked" id="step-3">
+        <div class="step-connector"></div>
+        <div class="step-icon-wrap">
+          <div class="step-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3 class="step-title">Project Submitted</h3>
+            <span class="badge badge-locked">Locked</span>
+          </div>
+          <p class="step-desc">Upload your GitHub repo, demo video, and presentation deck.</p>
+        </div>
+      </div>
+
+      <!-- Step 4: Under Review -->
+      <div class="progress-step locked" id="step-4">
+        <div class="step-connector"></div>
+        <div class="step-icon-wrap">
+          <div class="step-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3 class="step-title">Under Review</h3>
+            <span class="badge badge-locked">Locked</span>
+          </div>
+          <p class="step-desc">Expert judges evaluate your submission based on innovation, execution, and impact.</p>
+        </div>
+      </div>
+
+      <!-- Step 5: Results -->
+      <div class="progress-step locked" id="step-5">
+        <div class="step-connector"></div>
+        <div class="step-icon-wrap">
+          <div class="step-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          </div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3 class="step-title">Results Announced</h3>
+            <span class="badge badge-locked">Locked</span>
+          </div>
+          <p class="step-desc">Winners, prizes, certificates, and internship opportunities are revealed! 🏆</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/js/progress.js"></script>
+</body>
+</html>

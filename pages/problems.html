@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Problem Statements — HackVerse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/problems.css" />
+</head>
+<body>
+  <!-- ─── NAV ─── -->
+  <nav class="app-nav">
+    <a href="/" class="app-logo"><span class="logo-hack">Hack</span><span class="logo-verse">Verse</span></a>
+    <div class="app-nav-center">
+      <a href="/pages/dashboard.html" class="app-nav-link">Dashboard</a>
+      <a href="/pages/problems.html" class="app-nav-link active">Problems</a>
+      <a href="/pages/team.html" class="app-nav-link">Team</a>
+      <a href="/pages/progress.html" class="app-nav-link">Progress</a>
+    </div>
+    <div class="app-nav-right">
+      <div class="nav-user-info">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+        <div style="display:flex;flex-direction:column;">
+          <span class="nav-user-name" id="nav-user-name">—</span>
+          <span class="nav-user-dept" id="nav-user-dept"></span>
+        </div>
+      </div>
+      <button class="btn-logout" id="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── PAGE ─── -->
+  <main class="page-container">
+    <div class="page-header fade-in">
+      <div class="page-breadcrumb">
+        <a href="/pages/dashboard.html">Dashboard</a>
+        <span class="sep">›</span>
+        <span>Problem Statements</span>
+      </div>
+      <h1 class="page-title">Problem <span class="gradient-text">Statements</span></h1>
+      <p class="page-subtitle">Showing challenges for your department: <strong id="dept-display">—</strong></p>
+    </div>
+
+    <!-- Current Selection Banner -->
+    <div class="current-selection fade-in stagger-1" id="current-selection" style="display:none;">
+      <div class="selection-icon">✅</div>
+      <div class="selection-text">
+        <span class="selection-label">Currently Selected</span>
+        <span class="selection-title" id="selection-title">—</span>
+      </div>
+      <button class="btn-deselect" id="btn-deselect">Change Selection</button>
+    </div>
+
+    <!-- Problem Cards -->
+    <div class="problems-grid" id="problems-grid">
+      <!-- Filled by JS -->
+    </div>
+  </main>
+
+  <script type="module" src="/js/problems.js"></script>
+</body>
+</html>
