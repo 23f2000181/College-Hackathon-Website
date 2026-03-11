@@ -63,6 +63,16 @@ a { text-decoration: none; color: inherit; }
 .dash-logo {
   font-size: 1.5rem;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+}
+
+.college-logo {
+  height: 42px;
+  width: auto;
+  margin-right: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 .logo-hack { color: var(--text-primary); }
 .logo-verse { background: var(--gradient-pink-cyan); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
