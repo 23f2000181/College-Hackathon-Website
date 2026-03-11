@@ -22,7 +22,8 @@
   <nav class="navbar" id="navbar">
     <a href="#" class="nav-logo">
       <img src="/logo.jpeg" alt="SVIT Logo" class="college-logo" />
-      <span class="logo-text-group"><span class="logo-main">SAI VIDYA</span><span class="logo-sub">INSTITUTE OF TECHNOLOGY</span></span>
+      <span class="logo-text-group"><span class="logo-main">SAI VIDYA</span><span class="logo-sub">INSTITUTE OF
+          TECHNOLOGY</span></span>
     </a>
     <ul class="nav-links">
       <li><a href="#departments" class="nav-link">Departments</a></li>
@@ -367,7 +368,8 @@
         <div class="footer-brand">
           <a href="#" class="nav-logo">
             <img src="/logo.jpeg" alt="SVIT Logo" class="college-logo" />
-            <span class="logo-text-group"><span class="logo-main">SAI VIDYA</span><span class="logo-sub">INSTITUTE OF TECHNOLOGY</span></span>
+            <span class="logo-text-group"><span class="logo-main">SAI VIDYA</span><span class="logo-sub">INSTITUTE OF
+                TECHNOLOGY</span></span>
           </a>
           <p class="footer-tagline">Where innovation meets creativity. Build, compete, and grow.</p>
         </div>
@@ -379,7 +381,7 @@
         </div>
         <div class="footer-links-group">
           <h4 class="footer-heading">Resources</h4>
-          <a href="#">Rules & FAQ</a>
+          <a href="#" id="open-rules-modal">Rules & FAQ</a>
           <a href="#">Schedule</a>
           <a href="#">Contact Us</a>
         </div>
@@ -395,6 +397,110 @@
       </div>
     </div>
   </footer>
+
+  <!-- ─── RULES & FAQ MODAL ─── -->
+  <div class="rules-modal-overlay" id="rules-modal">
+    <div class="rules-modal">
+      <button class="rules-modal-close" id="close-rules-modal">&times;</button>
+      <div class="rules-modal-body">
+        <h2 class="rules-modal-title">Rules & <span class="gradient-text">Guidelines</span></h2>
+
+        <div class="rules-section">
+          <h3>📋 Event Structure</h3>
+          <h4>1. Problem Statement Release</h4>
+          <ul>
+            <li>Official problem statements will be released on <strong>16th March 2026</strong></li>
+            <li>Teams must choose 1 problem and come prepared with ideas, research, or initial design.</li>
+          </ul>
+          <h4>2. Team Formation</h4>
+          <ul>
+            <li>Team size should be <strong>4 members</strong> (fixed after registration)</li>
+            <li>Cross-department teams are <strong>not allowed</strong>.</li>
+            <li>One member must be nominated as Team Leader.</li>
+          </ul>
+          <h4>3. Screening & Rounds</h4>
+          <div class="rules-round">
+            <strong>Level 1 – Idea Screening (Presentation Round):</strong>
+            <ul>
+              <li>Teams will present their approach, technical stack, and solution plan (8–10 minutes).</li>
+              <li>Top teams will be shortlisted for Level 2.</li>
+            </ul>
+          </div>
+          <div class="rules-round">
+            <strong>Level 2 – Presentation / Prototyping / Coding Round (Final):</strong>
+            <ul>
+              <li>Shortlisted teams should complete their Presentation / develop prototype / Coding.</li>
+              <li>Final demo + Q&A to the judging panel will be on <strong>9th-11th April 2026</strong></li>
+            </ul>
+          </div>
+          <h4>4. Judging Criteria</h4>
+          <ul>
+            <li>Innovation & Creativity – <strong>10%</strong></li>
+            <li>Problem Understanding – <strong>10%</strong></li>
+            <li>Technical Implementation – <strong>10%</strong></li>
+            <li>Working Demo / Prototype – <strong>50%</strong></li>
+            <li>Presentation & Teamwork – <strong>20%</strong></li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h3>🏆 Prizes</h3>
+          <div class="prizes-grid">
+            <div class="prize-card prize-gold"><span class="prize-place">1st Prize</span><span
+                class="prize-amount">₹10,000</span></div>
+            <div class="prize-card prize-silver"><span class="prize-place">2nd Prize</span><span
+                class="prize-amount">₹8,000</span></div>
+            <div class="prize-card prize-bronze"><span class="prize-place">3rd Prize</span><span
+                class="prize-amount">₹5,000</span></div>
+          </div>
+        </div>
+
+        <div class="rules-section">
+          <h3>⚖️ Rules & Regulations</h3>
+          <ul>
+            <li>All work must be original and developed only during the hackathon (except initial research and design).
+            </li>
+            <li>Use of open-source libraries/APIs is allowed with proper credits.</li>
+            <li>The decision of judges will be <strong>final</strong>.</li>
+            <li>Teams must adhere to timeline, discipline, and fair play.</li>
+            <li>Plagiarism, copying other teams' code, or unethical behavior will result in
+              <strong>disqualification</strong>.</li>
+            <li>Bring your own laptops, chargers, and necessary tools.</li>
+            <li>Internet will be provided (if applicable).</li>
+            <li>Participants must be present in the venue throughout the event (no proxy).</li>
+          </ul>
+        </div>
+
+        <div class="rules-section">
+          <h3>📦 Deliverables</h3>
+          <p>Teams must submit at final evaluation:</p>
+          <ol>
+            <li>Prototype / Demo</li>
+            <li>Source Code / GitHub Link</li>
+            <li>PPT (Max 8 Slides) covering:
+              <ul>
+                <li>Problem</li>
+                <li>Proposed solution</li>
+                <li>Architecture / Tech stack</li>
+                <li>Implementation</li>
+                <li>Results</li>
+                <li>Future scope</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
+        <div class="rules-section">
+          <h3>🤝 Code of Conduct</h3>
+          <ul>
+            <li>Maintain professionalism, teamwork, and respect for all.</li>
+            <li>No offensive content in ideas or presentations.</li>
+            <li>Coordinators reserve the right to modify rules in special cases.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="/main.js"></script>
 </body>

@@ -21,6 +21,41 @@ if (session) {
   const deptName = DEPT_NAMES[dept] || session.departmentLabel;
   document.getElementById('dept-display').textContent = deptName;
 
+  // ─── Preparation Help Links (per department) ───
+  const PREP_COURSES = {
+    'cse': {
+      topic: 'Learn App Development',
+      url: 'https://www.udemy.com/course/creating-a-quiz-game-app-from-scratch-android-studio/',
+    },
+    'ise': {
+      topic: 'Learn Web Development Basics',
+      url: 'https://www.udemy.com/course/html-css-mastery-2025/',
+    },
+    'cse-aiml': {
+      topic: 'Learn Agentic AI',
+      url: 'https://www.udemy.com/course/agentic-minds-crew-ai/',
+    },
+    'cse-ds': {
+      topic: 'Learn Agentic AI',
+      url: 'https://www.udemy.com/course/agentic-minds-crew-ai/',
+    },
+    'ece': {
+      topic: 'Learn Circuit Design',
+      url: 'https://www.udemy.com/course/digital-circuit-design-and-implementation/',
+    },
+    // CIVIL and MECH — links TBD
+    // 'civil': { topic: '...', url: '...' },
+    // 'mech': { topic: '...', url: '...' },
+  };
+
+  const prepCourse = PREP_COURSES[dept];
+  const prepBanner = document.getElementById('prep-banner');
+  if (prepCourse && prepBanner) {
+    document.getElementById('prep-topic').textContent = prepCourse.topic;
+    document.getElementById('prep-link').href = prepCourse.url;
+    prepBanner.style.display = '';
+  }
+
   async function renderProblems() {
     const grid = document.getElementById('problems-grid');
     grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-tertiary);">Loading...</div>';

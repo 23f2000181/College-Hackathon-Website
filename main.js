@@ -599,6 +599,35 @@ function initScrollSpy() {
   sections.forEach((section) => observer.observe(section));
 }
 
+// ─── RULES & FAQ MODAL ───
+function initRulesModal() {
+  const openBtn = document.getElementById('open-rules-modal');
+  const closeBtn = document.getElementById('close-rules-modal');
+  const overlay = document.getElementById('rules-modal');
+  if (!openBtn || !overlay) return;
+
+  openBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  });
+
+  function closeModal() {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+  });
+}
+
 // ─── INITIALIZE EVERYTHING ───
 document.addEventListener('DOMContentLoaded', async () => {
   await loadDynamicStats();
@@ -611,5 +640,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   initCardTilt();
   initSectionLabels();
   initScrollSpy();
+  initRulesModal();
 });
 
