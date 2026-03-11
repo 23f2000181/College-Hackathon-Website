@@ -544,6 +544,11 @@ img {
   align-items: center;
 }
 
+.stat-value {
+  display: flex;
+  align-items: baseline;
+}
+
 .stat-number {
   font-size: 2.5rem;
   font-weight: 900;
