@@ -109,6 +109,119 @@ export function logout() {
   window.location.href = '/';
 }
 
+// ─── MENTOR SYSTEM HELPERS ───
+
+export function requireMentorAuth() {
+  const session = getSession();
+  if (!session || !session.isMentor) {
+    window.location.href = '/login.html';
+    return null;
+  }
+  return session;
+}
+
+export async function getMentorsByDept(dept) {
+  // Get mentors
+  const { data: mentors } = await supabase
+    .from('mentors')
+    .select('*')
+    .eq('department', dept)
+    .order('name');
+
+  if (!mentors) return [];
+
+  // Get assignment counts
+  const { data: assignments } = await supabase
+    .from('mentor_assignments')
+    .select('mentor_id');
+
+  const counts = {};
+  (assignments || []).forEach((a) => {
+    counts[a.mentor_id] = (counts[a.mentor_id] || 0) + 1;
+  });
+
+  return mentors.map((m) => ({
+    ...m,
+    assignedCount: counts[m.id] || 0,
+    slotsAvailable: (m.max_teams || 4) - (counts[m.id] || 0),
+  }));
+}
+
+export async function getTeamMentor(teamId) {
+  const { data } = await supabase
+    .from('mentor_assignments')
+    .select('*, mentors:mentor_id(*)')
+    .eq('team_id', teamId)
+    .maybeSingle();
+  return data ? data.mentors : null;
+}
+
+export async function assignMentor(teamId, mentorId) {
+  // Check mentor capacity
+  const { count } = await supabase
+    .from('mentor_assignments')
+    .select('*', { count: 'exact', head: true })
+    .eq('mentor_id', mentorId);
+
+  if (count >= 4) {
+    return { success: false, message: 'This mentor already has 4 teams assigned.' };
+  }
+
+  // Check if team already has a mentor
+  const { data: existing } = await supabase
+    .from('mentor_assignments')
+    .select('id')
+    .eq('team_id', teamId)
+    .maybeSingle();
+
+  if (existing) {
+    return { success: false, message: 'Your team already has a mentor assigned.' };
+  }
+
+  // Assign
+  const { error } = await supabase
+    .from('mentor_assignments')
+    .insert({ mentor_id: mentorId, team_id: teamId });
+
+  if (error) return { success: false, message: error.message };
+  return { success: true };
+}
+
+export async function getSubmission(teamId) {
+  const { data } = await supabase
+    .from('submissions')
+    .select('*')
+    .eq('team_id', teamId)
+    .maybeSingle();
+  return data || null;
+}
+
+export async function upsertSubmission(teamId, { github_url, readme_desc, youtube_url }) {
+  // Check if submission exists
+  const existing = await getSubmission(teamId);
+
+  if (existing) {
+    const { error } = await supabase
+      .from('submissions')
+      .update({ github_url, readme_desc, youtube_url, updated_at: new Date().toISOString() })
+      .eq('team_id', teamId);
+    return !error;
+  } else {
+    const { error } = await supabase
+      .from('submissions')
+      .insert({ team_id: teamId, github_url, readme_desc, youtube_url });
+    return !error;
+  }
+}
+
+export async function getAllMentors() {
+  const { data } = await supabase
+    .from('mentors')
+    .select('*')
+    .order('department, name');
+  return data || [];
+}
+
 // ─── POPULATE NAV (shared across all app pages) ───
 export function initAppNav(session) {
   if (!session) return;

@@ -1,0 +1,417 @@
+/* Mentor Dashboard Styles — Light Neon Theme */
+
+.mentor-badge-nav {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(51, 204, 255, 0.1));
+  color: var(--accent-purple);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(168, 85, 247, 0.15);
+}
+
+/* ─── TABS ─── */
+.mentor-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.mentor-tab {
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(200, 190, 240, 0.3);
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.5), rgba(230, 240, 255, 0.4));
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+}
+
+.mentor-tab:hover {
+  border-color: rgba(168, 85, 247, 0.2);
+  color: var(--text-primary);
+}
+
+.mentor-tab.active {
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.15);
+}
+
+.mentor-panel.hidden {
+  display: none;
+}
+
+/* ─── TEAMS GRID ─── */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+.team-card {
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.7), rgba(230, 240, 255, 0.6));
+  border: 1px solid rgba(200, 190, 240, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.04);
+}
+
+.team-card:hover {
+  border-color: rgba(168, 85, 247, 0.15);
+  box-shadow: 0 8px 30px rgba(168, 85, 247, 0.06);
+  transform: translateY(-2px);
+}
+
+.team-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.team-card-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.team-card-dept {
+  font-size: 0.8rem;
+  color: var(--accent-purple);
+  font-weight: 600;
+  background: rgba(168, 85, 247, 0.08);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.team-card-members {
+  margin-bottom: 12px;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.team-card-members strong {
+  color: var(--text-primary);
+}
+
+.team-card-ps {
+  padding: 12px 16px;
+  background: rgba(51, 204, 255, 0.06);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+}
+
+.team-card-ps-label {
+  font-weight: 600;
+  color: var(--accent-cyan);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.team-card-ps-title {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.team-card-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.status-badge {
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.status-badge.submitted {
+  background: rgba(0, 228, 159, 0.1);
+  color: #00b87a;
+}
+
+.status-badge.pending {
+  background: rgba(255, 215, 0, 0.1);
+  color: #b8960b;
+}
+
+.btn-review {
+  padding: 8px 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+}
+
+.btn-review:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.2);
+}
+
+/* ─── SUBMISSIONS ─── */
+.submission-card {
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.7), rgba(230, 240, 255, 0.6));
+  border: 1px solid rgba(200, 190, 240, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.04);
+}
+
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.submission-team {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.submission-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.submission-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(200, 190, 240, 0.3);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.submission-link:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+.submission-link.github {
+  border-color: rgba(26, 29, 46, 0.15);
+}
+
+.submission-link.youtube {
+  border-color: rgba(255, 0, 0, 0.15);
+  color: #cc0000;
+}
+
+.submission-readme {
+  padding: 16px 20px;
+  background: rgba(248, 249, 252, 0.8);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 16px;
+  border: 1px solid rgba(200, 190, 240, 0.2);
+}
+
+.submission-review-existing {
+  padding: 16px 20px;
+  background: rgba(0, 228, 159, 0.05);
+  border: 1px solid rgba(0, 228, 159, 0.15);
+  border-radius: 10px;
+  margin-top: 12px;
+}
+
+.submission-review-existing .review-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #00b87a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.submission-review-existing .review-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.review-rating-display {
+  color: #FFD700;
+  font-size: 1rem;
+  margin-top: 6px;
+}
+
+/* ─── REVIEW MODAL ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  max-width: 520px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+}
+
+.modal-close:hover {
+  background: var(--bg-tertiary);
+}
+
+.modal-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.modal-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+}
+
+.rating-stars {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.star {
+  font-size: 2rem;
+  color: var(--bg-tertiary);
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.star:hover,
+.star.active {
+  color: #FFD700;
+  transform: scale(1.15);
+}
+
+.review-textarea {
+  width: 100%;
+  border: 1px solid rgba(200, 190, 240, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 0.95rem;
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  resize: vertical;
+  background: var(--bg-secondary);
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.review-textarea:focus {
+  outline: none;
+  border-color: var(--accent-purple);
+}
+
+.btn-submit-review {
+  width: 100%;
+  padding: 14px;
+  margin-top: 16px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-family);
+}
+
+.btn-submit-review:hover {
+  box-shadow: 0 8px 30px rgba(168, 85, 247, 0.2);
+  transform: translateY(-1px);
+}
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-tertiary);
+}
+
+.empty-state span {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 768px) {
+  .teams-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mentor-tabs {
+    gap: 6px;
+  }
+
+  .mentor-tab {
+    padding: 8px 16px;
+    font-size: 0.82rem;
+  }
+
+  .modal-content {
+    padding: 28px;
+  }
+}

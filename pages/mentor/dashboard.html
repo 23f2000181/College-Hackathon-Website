@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentor Dashboard — HackVerse</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/mentor.css" />
+</head>
+<body>
+  <!-- ─── NAV ─── -->
+  <nav class="app-nav">
+    <a href="/" class="app-logo"><img src="/logo.jpeg" alt="SVIT Logo" class="college-logo" /><span class="logo-text-group"><span class="logo-main">SAI VIDYA</span><span class="logo-sub">INSTITUTE OF TECHNOLOGY</span></span></a>
+    <div class="app-nav-center">
+      <span class="mentor-badge-nav">🎓 Mentor</span>
+    </div>
+    <div class="app-nav-right">
+      <div class="nav-user-info">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+        <div style="display:flex;flex-direction:column;">
+          <span class="nav-user-name" id="nav-user-name">—</span>
+          <span class="nav-user-dept" id="nav-user-dept"></span>
+        </div>
+      </div>
+      <button class="btn-logout" id="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span>Log Out</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── PAGE ─── -->
+  <main class="page-container">
+    <div class="page-header fade-in">
+      <h1 class="page-title">Mentor <span class="gradient-text">Dashboard</span></h1>
+      <p class="page-subtitle">Monitor your assigned teams, review submissions, and provide feedback.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mentor-tabs fade-in stagger-1">
+      <button class="mentor-tab active" data-tab="my-teams">My Teams</button>
+      <button class="mentor-tab" data-tab="submissions">Submissions</button>
+      <button class="mentor-tab" data-tab="all-teams">Browse All Teams</button>
+    </div>
+
+    <!-- My Teams Panel -->
+    <section id="panel-my-teams" class="mentor-panel fade-in stagger-2">
+      <div class="teams-grid" id="my-teams-grid">
+        <!-- Filled by JS -->
+      </div>
+      <div class="empty-state" id="my-teams-empty" style="display:none;">
+        <span>📭</span>
+        <p>No teams assigned to you yet.</p>
+      </div>
+    </section>
+
+    <!-- Submissions Panel -->
+    <section id="panel-submissions" class="mentor-panel hidden fade-in stagger-2">
+      <div class="submissions-list" id="submissions-list">
+        <!-- Filled by JS -->
+      </div>
+      <div class="empty-state" id="submissions-empty" style="display:none;">
+        <span>📋</span>
+        <p>No submissions received yet.</p>
+      </div>
+    </section>
+
+    <!-- All Teams Panel -->
+    <section id="panel-all-teams" class="mentor-panel hidden fade-in stagger-2">
+      <div class="submissions-list" id="all-teams-list">
+        <!-- Filled by JS -->
+      </div>
+      <div class="empty-state" id="all-teams-empty" style="display:none;">
+        <span>🔍</span>
+        <p>No team submissions available yet.</p>
+      </div>
+    </section>
+
+    <!-- Review Modal -->
+    <div class="modal-overlay" id="review-modal">
+      <div class="modal-content">
+        <button class="modal-close" id="close-review-modal">✕</button>
+        <h2 class="modal-title">Write Review</h2>
+        <p class="modal-subtitle" id="review-team-name"></p>
+        <div class="review-form">
+          <div class="rating-stars" id="rating-stars">
+            <span class="star" data-rating="1">★</span>
+            <span class="star" data-rating="2">★</span>
+            <span class="star" data-rating="3">★</span>
+            <span class="star" data-rating="4">★</span>
+            <span class="star" data-rating="5">★</span>
+          </div>
+          <textarea class="review-textarea" id="review-feedback" placeholder="Write your feedback, comments, and suggestions..." rows="5"></textarea>
+          <button class="btn-submit-review" id="btn-submit-review">Submit Review</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/js/mentor-dashboard.js"></script>
+</body>
+</html>

@@ -113,3 +113,77 @@ INSERT INTO problem_statements (id, department, title, description, difficulty) 
   ('civil-3', 'civil', 'GIS-based Land Use Mapper', 'Develop a GIS application that maps and analyzes land use patterns using satellite data and overlays.', 'Hard'),
   ('civil-4', 'civil', 'Water Distribution Network Simulator', 'Build a simulator for designing and analyzing water distribution networks with flow and pressure analysis.', 'Hard'),
   ('civil-5', 'civil', 'Site Safety Checklist App', 'Create a digital checklist app for construction site safety inspections with photo documentation.', 'Easy');
+
+
+-- ═══════════════════════════════════════════════
+-- MENTOR SYSTEM TABLES
+-- ═══════════════════════════════════════════════
+
+-- 4. Mentors (registered by admin)
+CREATE TABLE IF NOT EXISTS mentors (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  department TEXT NOT NULL,
+  max_teams INT DEFAULT 4,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Mentor ↔ Team assignments
+CREATE TABLE IF NOT EXISTS mentor_assignments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE,
+  team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+  assigned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(team_id)  -- each team gets exactly one mentor
+);
+
+-- 6. Project submissions
+CREATE TABLE IF NOT EXISTS submissions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  team_id UUID REFERENCES teams(id) ON DELETE CASCADE UNIQUE,
+  github_url TEXT NOT NULL,
+  readme_desc TEXT NOT NULL,
+  youtube_url TEXT NOT NULL,
+  submitted_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Mentor reviews
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE,
+  team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+  feedback TEXT NOT NULL,
+  rating INT CHECK (rating >= 1 AND rating <= 5),
+  reviewed_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(mentor_id, team_id)
+);
+
+-- Enable RLS on new tables
+ALTER TABLE mentors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE mentor_assignments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE submissions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+
+-- Public policies (matching existing pattern)
+CREATE POLICY "public_select_mentors" ON mentors FOR SELECT USING (true);
+CREATE POLICY "public_insert_mentors" ON mentors FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_mentors" ON mentors FOR UPDATE USING (true);
+CREATE POLICY "public_delete_mentors" ON mentors FOR DELETE USING (true);
+
+CREATE POLICY "public_select_assignments" ON mentor_assignments FOR SELECT USING (true);
+CREATE POLICY "public_insert_assignments" ON mentor_assignments FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_assignments" ON mentor_assignments FOR UPDATE USING (true);
+CREATE POLICY "public_delete_assignments" ON mentor_assignments FOR DELETE USING (true);
+
+CREATE POLICY "public_select_submissions" ON submissions FOR SELECT USING (true);
+CREATE POLICY "public_insert_submissions" ON submissions FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_submissions" ON submissions FOR UPDATE USING (true);
+CREATE POLICY "public_delete_submissions" ON submissions FOR DELETE USING (true);
+
+CREATE POLICY "public_select_reviews" ON reviews FOR SELECT USING (true);
+CREATE POLICY "public_insert_reviews" ON reviews FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_reviews" ON reviews FOR UPDATE USING (true);
+CREATE POLICY "public_delete_reviews" ON reviews FOR DELETE USING (true);

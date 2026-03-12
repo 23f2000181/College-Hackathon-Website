@@ -111,6 +111,38 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
+  // ─── MENTOR LOGIN CHECK ───
+  const { data: mentor, error: mentorError } = await supabase
+    .from('mentors')
+    .select('*')
+    .eq('email', email)
+    .eq('password', passwordInput.value)
+    .maybeSingle();
+
+  if (mentor) {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+
+    localStorage.setItem(
+      'hackverse_session',
+      JSON.stringify({
+        isMentor: true,
+        mentorId: mentor.id,
+        leaderName: mentor.name,
+        email: mentor.email,
+        department: mentor.department,
+        departmentLabel: mentor.department.toUpperCase(),
+        loggedInAt: new Date().toISOString(),
+      })
+    );
+
+    showToast(`Welcome, ${mentor.name}!`, 'success');
+    setTimeout(() => {
+      window.location.href = '/pages/mentor/dashboard.html';
+    }, 1500);
+    return;
+  }
+
   // ─── TEAM LOGIN VIA SUPABASE ───
   const { data: team, error } = await supabase
     .from('teams')

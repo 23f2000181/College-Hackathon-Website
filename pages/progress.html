@@ -17,6 +17,7 @@
     <div class="app-nav-center">
       <a href="/pages/dashboard.html" class="app-nav-link">Dashboard</a>
       <a href="/pages/problems.html" class="app-nav-link">Problems</a>
+      <a href="/pages/mentors.html" class="app-nav-link">Mentors</a>
       <a href="/pages/team.html" class="app-nav-link">Team</a>
       <a href="/pages/progress.html" class="app-nav-link active">Progress</a>
     </div>
@@ -97,8 +98,28 @@
         </div>
       </div>
 
-      <!-- Step 3: Project Submitted -->
+      <!-- Step 3: Mentor Selected -->
       <div class="progress-step locked" id="step-3">
+        <div class="step-connector"></div>
+        <div class="step-icon-wrap">
+          <div class="step-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+          </div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">
+            <h3 class="step-title">Mentor Selected</h3>
+            <span class="badge badge-locked" id="step-3-badge">Locked</span>
+          </div>
+          <p class="step-desc" id="step-3-desc">Choose a mentor from your department to guide your project.</p>
+          <div class="step-action" id="step-3-action" style="display:none;">
+            <a href="/pages/mentors.html" class="step-btn">Choose Mentor →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Project Submitted -->
+      <div class="progress-step locked" id="step-4">
         <div class="step-connector"></div>
         <div class="step-icon-wrap">
           <div class="step-icon">
@@ -108,14 +129,17 @@
         <div class="step-content">
           <div class="step-header">
             <h3 class="step-title">Project Submitted</h3>
-            <span class="badge badge-locked">Locked</span>
+            <span class="badge badge-locked" id="step-4-badge">Locked</span>
           </div>
-          <p class="step-desc">Upload your GitHub repo, demo video, and presentation deck.</p>
+          <p class="step-desc" id="step-4-desc">Upload your GitHub repo, demo video, and project description.</p>
+          <div class="step-action" id="step-4-action" style="display:none;">
+            <a href="/pages/submit.html" class="step-btn">Submit Project →</a>
+          </div>
         </div>
       </div>
 
-      <!-- Step 4: Under Review -->
-      <div class="progress-step locked" id="step-4">
+      <!-- Step 5: Under Review -->
+      <div class="progress-step locked" id="step-5">
         <div class="step-connector"></div>
         <div class="step-icon-wrap">
           <div class="step-icon">
@@ -127,12 +151,12 @@
             <h3 class="step-title">Under Review</h3>
             <span class="badge badge-locked">Locked</span>
           </div>
-          <p class="step-desc">Expert judges evaluate your submission based on innovation, execution, and impact.</p>
+          <p class="step-desc">Your mentor and judges evaluate your submission.</p>
         </div>
       </div>
 
-      <!-- Step 5: Results -->
-      <div class="progress-step locked" id="step-5">
+      <!-- Step 6: Results -->
+      <div class="progress-step locked" id="step-6">
         <div class="step-connector"></div>
         <div class="step-icon-wrap">
           <div class="step-icon">

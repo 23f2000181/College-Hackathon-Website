@@ -138,11 +138,17 @@ if (session) {
     // Button listeners
     grid.querySelectorAll('.btn-select:not(.selected)').forEach((btn) => {
       btn.addEventListener('click', async () => {
+        const psTitle = allProblems.find((p) => p.id === btn.dataset.id)?.title || 'this problem';
+        const confirmed = confirm(
+          `Are you sure you want to select "${psTitle}"?\n\nOnce selected, other teams won't be able to choose this problem statement. If another team selects a different PS while you decide, it will no longer be available to you.`
+        );
+        if (!confirmed) return;
+
         btn.textContent = '...';
         btn.disabled = true;
         const success = await selectPS(session.teamId, btn.dataset.id);
         if (success) {
-          showToast(`Selected: ${allProblems.find((p) => p.id === btn.dataset.id)?.title}`, 'success');
+          showToast(`Selected: ${psTitle}`, 'success');
           renderProblems();
         } else {
           showToast('Failed to select problem statement', 'error');

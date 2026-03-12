@@ -47,6 +47,10 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         Problem Statements
       </button>
+      <button class="admin-tab" data-tab="mentors">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+        Mentors
+      </button>
     </div>
 
     <!-- ─── OVERVIEW TAB ─── -->
@@ -219,6 +223,46 @@
 
         <!-- Existing PS list -->
         <div class="ps-list" id="ps-list">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MENTORS TAB ─── -->
+    <section class="admin-panel hidden" id="panel-mentors">
+      <div class="admin-header fade-in">
+        <h1 class="admin-title">Manage <span class="gradient-text">Mentors</span></h1>
+        <p class="admin-subtitle">Register and manage mentors for each department.</p>
+      </div>
+
+      <div class="ps-manager fade-in stagger-1">
+        <!-- Add mentor form -->
+        <div class="add-ps-form">
+          <h3 class="form-heading">Register New Mentor</h3>
+          <div class="form-row">
+            <input type="text" class="admin-input" id="mentor-name" placeholder="Mentor full name..." />
+            <input type="email" class="admin-input" id="mentor-email" placeholder="Email address..." />
+          </div>
+          <div class="form-row">
+            <input type="text" class="admin-input" id="mentor-password" placeholder="Login password..." />
+            <select class="admin-select" id="mentor-dept">
+              <option value="cse">CSE</option>
+              <option value="cse-aiml">CSE - AIML</option>
+              <option value="cse-ds">CSE - DS</option>
+              <option value="ise">ISE</option>
+              <option value="ece">ECE</option>
+              <option value="mech">MECH</option>
+              <option value="civil">CIVIL</option>
+            </select>
+          </div>
+          <button class="btn-add-ps" id="btn-add-mentor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Register Mentor
+          </button>
+        </div>
+
+        <!-- Existing mentors list -->
+        <div class="ps-list" id="mentor-list">
           <!-- Filled by JS -->
         </div>
       </div>

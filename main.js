@@ -45,19 +45,19 @@ class HeroScene {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Lights — warm neutral palette
-    const ambientLight = new THREE.AmbientLight(0xfaf7f2, 0.6);
+    // Lights — neon palette
+    const ambientLight = new THREE.AmbientLight(0xf8f9fc, 0.6);
     this.scene.add(ambientLight);
 
-    const pointLight1 = new THREE.PointLight(0x8b5e3c, 1.5, 20);
+    const pointLight1 = new THREE.PointLight(0xff00e4, 1.5, 20);
     pointLight1.position.set(3, 3, 3);
     this.scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight(0xc8a97e, 1.5, 20);
+    const pointLight2 = new THREE.PointLight(0x33ccff, 1.5, 20);
     pointLight2.position.set(-3, -2, 4);
     this.scene.add(pointLight2);
 
-    const pointLight3 = new THREE.PointLight(0xb8860b, 1, 20);
+    const pointLight3 = new THREE.PointLight(0xffd700, 1, 20);
     pointLight3.position.set(0, 4, 2);
     this.scene.add(pointLight3);
   }
@@ -65,10 +65,10 @@ class HeroScene {
   createGeometries() {
     this.geometryGroup = new THREE.Group();
 
-    // Central Icosahedron — warm brown wireframe
+    // Central Icosahedron — neon pink wireframe
     const icoGeo = new THREE.IcosahedronGeometry(1.2, 1);
     const icoMat = new THREE.MeshPhongMaterial({
-      color: 0x8b5e3c,
+      color: 0xff00e4,
       wireframe: true,
       transparent: true,
       opacity: 0.35,
@@ -76,25 +76,25 @@ class HeroScene {
     this.icosahedron = new THREE.Mesh(icoGeo, icoMat);
     this.geometryGroup.add(this.icosahedron);
 
-    // Inner glow sphere — warm sand
+    // Inner glow sphere — cyan glow
     const glowGeo = new THREE.SphereGeometry(0.8, 32, 32);
     const glowMat = new THREE.MeshPhongMaterial({
-      color: 0xc8a97e,
+      color: 0x33ccff,
       transparent: true,
       opacity: 0.08,
-      emissive: 0xc8a97e,
+      emissive: 0x33ccff,
       emissiveIntensity: 0.15,
     });
     this.glowSphere = new THREE.Mesh(glowGeo, glowMat);
     this.geometryGroup.add(this.glowSphere);
 
-    // Orbiting Torus 1 — accent sand
+    // Orbiting Torus 1 — accent cyan
     const torusGeo1 = new THREE.TorusGeometry(2, 0.015, 16, 100);
     const torusMat1 = new THREE.MeshPhongMaterial({
-      color: 0xc8a97e,
+      color: 0x33ccff,
       transparent: true,
       opacity: 0.3,
-      emissive: 0xc8a97e,
+      emissive: 0x33ccff,
       emissiveIntensity: 0.1,
     });
     this.torus1 = new THREE.Mesh(torusGeo1, torusMat1);
@@ -102,13 +102,13 @@ class HeroScene {
     this.torus1.rotation.y = Math.PI / 6;
     this.geometryGroup.add(this.torus1);
 
-    // Orbiting Torus 2 — dark gold
+    // Orbiting Torus 2 — golden yellow
     const torusGeo2 = new THREE.TorusGeometry(2.5, 0.01, 16, 100);
     const torusMat2 = new THREE.MeshPhongMaterial({
-      color: 0xb8860b,
+      color: 0xffd700,
       transparent: true,
       opacity: 0.2,
-      emissive: 0xb8860b,
+      emissive: 0xffd700,
       emissiveIntensity: 0.08,
     });
     this.torus2 = new THREE.Mesh(torusGeo2, torusMat2);
@@ -116,9 +116,9 @@ class HeroScene {
     this.torus2.rotation.z = Math.PI / 5;
     this.geometryGroup.add(this.torus2);
 
-    // Small floating octahedrons — warm palette
+    // Small floating octahedrons — neon palette
     this.smallShapes = [];
-    const smallColors = [0x8b5e3c, 0xc8a97e, 0xb8860b, 0x5a7247, 0x7b6b8a];
+    const smallColors = [0xff00e4, 0x33ccff, 0xffd700, 0x00e49f, 0xa855f7];
     for (let i = 0; i < 12; i++) {
       const size = 0.05 + Math.random() * 0.1;
       const geo = Math.random() > 0.5
@@ -157,9 +157,9 @@ class HeroScene {
   }
 
   createRayBursts() {
-    // Subtle ray lines radiating outward — warm tones
+    // Subtle ray lines radiating outward — neon tones
     const rayGroup = new THREE.Group();
-    const rayColors = [0x8b5e3c, 0xc8a97e, 0xb8860b, 0x7b6b8a, 0x5a7247];
+    const rayColors = [0xff00e4, 0x33ccff, 0xffd700, 0xa855f7, 0x00e49f];
 
     for (let i = 0; i < 60; i++) {
       const angle = (i / 60) * Math.PI * 2 + (Math.random() - 0.5) * 0.3;
@@ -199,17 +199,17 @@ class HeroScene {
   }
 
   createParticles() {
-    // Floating particles — warm palette
+    // Floating particles — neon palette
     const particleCount = 120;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
 
     const colorPalette = [
-      new THREE.Color(0x8b5e3c),
-      new THREE.Color(0xc8a97e),
-      new THREE.Color(0xb8860b),
-      new THREE.Color(0x5a7247),
+      new THREE.Color(0xff00e4),
+      new THREE.Color(0x33ccff),
+      new THREE.Color(0xffd700),
+      new THREE.Color(0x00e49f),
     ];
 
     for (let i = 0; i < particleCount; i++) {
@@ -685,5 +685,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSectionLabels();
   initScrollSpy();
   initRulesModal();
+
+  // Department cards → redirect to login
+  document.querySelectorAll('.dept-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      window.location.href = '/login.html';
+    });
+  });
 });
 

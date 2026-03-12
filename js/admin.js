@@ -38,6 +38,7 @@ tabs.forEach((tab) => {
     if (tab.dataset.tab === 'overview') renderOverview();
     if (tab.dataset.tab === 'registrations') renderRegistrations();
     if (tab.dataset.tab === 'problems') renderPSList();
+    if (tab.dataset.tab === 'mentors') renderMentors();
   });
 });
 
@@ -317,6 +318,109 @@ async function renderPSList() {
         renderPSList();
         renderOverview();
       }
+    });
+  });
+}
+
+// ═════════════════════════════════════════
+//  MENTORS TAB
+// ═════════════════════════════════════════
+
+// Add Mentor
+const addMentorBtn = document.getElementById('btn-add-mentor');
+if (addMentorBtn) {
+  addMentorBtn.addEventListener('click', async () => {
+    const name = document.getElementById('mentor-name').value.trim();
+    const email = document.getElementById('mentor-email').value.trim();
+    const password = document.getElementById('mentor-password').value.trim();
+    const dept = document.getElementById('mentor-dept').value;
+
+    if (!name || !email || !password) {
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('mentors')
+      .insert({ name, email, password, department: dept });
+
+    if (error) {
+      alert('Error adding mentor: ' + error.message);
+      return;
+    }
+
+    // Clear form
+    document.getElementById('mentor-name').value = '';
+    document.getElementById('mentor-email').value = '';
+    document.getElementById('mentor-password').value = '';
+
+    renderMentors();
+  });
+}
+
+async function renderMentors() {
+  const { data: mentors } = await supabase
+    .from('mentors')
+    .select('*')
+    .order('department, name');
+
+  // Get assignment counts
+  const { data: assignments } = await supabase
+    .from('mentor_assignments')
+    .select('mentor_id');
+
+  const counts = {};
+  (assignments || []).forEach((a) => {
+    counts[a.mentor_id] = (counts[a.mentor_id] || 0) + 1;
+  });
+
+  const list = document.getElementById('mentor-list');
+  list.innerHTML = '';
+
+  const items = mentors || [];
+
+  if (items.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center; padding: 40px; color: var(--text-tertiary);">
+        <p>No mentors registered yet.</p>
+      </div>
+    `;
+    return;
+  }
+
+  items.forEach((m, i) => {
+    const assignedCount = counts[m.id] || 0;
+    const item = document.createElement('div');
+    item.className = 'ps-item';
+
+    item.innerHTML = `
+      <div class="ps-item-number">${String(i + 1).padStart(2, '0')}</div>
+      <div class="ps-item-body">
+        <div class="ps-item-title">${m.name}</div>
+        <div class="ps-item-desc">${m.email}</div>
+      </div>
+      <div class="ps-item-meta">
+        <span class="badge badge-medium">${DEPT_NAMES[m.department] || m.department}</span>
+        <span class="ps-taken-tag">${assignedCount}/${m.max_teams || 4} teams</span>
+        <button class="btn-delete-ps" data-id="${m.id}" title="Delete">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </button>
+      </div>
+    `;
+
+    list.appendChild(item);
+  });
+
+  // Delete handlers
+  list.querySelectorAll('.btn-delete-ps').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this mentor? This will also remove their team assignments.')) return;
+      const { error } = await supabase
+        .from('mentors')
+        .delete()
+        .eq('id', btn.dataset.id);
+
+      if (!error) renderMentors();
     });
   });
 }

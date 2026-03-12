@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════
    HackVerse — Admin Panel Styles
-   Light Warm-Neutral Developer Theme
+   Light Neon Theme
    ═══════════════════════════════════════════════ */
 
 /* Admin nav */
 .admin-nav {
-  border-bottom-color: rgba(184, 134, 11, 0.15) !important;
+  border-bottom-color: rgba(255, 215, 0, 0.15) !important;
 }
 
 .admin-badge-wrap {
@@ -20,8 +20,8 @@
   gap: 6px;
   padding: 6px 18px;
   border-radius: 100px;
-  background: rgba(184, 134, 11, 0.06);
-  border: 1px solid rgba(184, 134, 11, 0.15);
+  background: rgba(255, 215, 0, 0.06);
+  border: 1px solid rgba(255, 215, 0, 0.15);
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--accent-yellow);
@@ -44,7 +44,7 @@
   border-radius: var(--radius-md);
   padding: 4px;
   margin-bottom: 32px;
-  box-shadow: 0 1px 3px rgba(62, 44, 35, 0.04);
+  box-shadow: 0 1px 3px rgba(26, 29, 46, 0.04);
 }
 
 .admin-tab {
@@ -67,12 +67,12 @@
 
 .admin-tab:hover {
   color: var(--text-secondary);
-  background: rgba(139, 94, 60, 0.03);
+  background: rgba(255, 0, 228, 0.03);
 }
 
 .admin-tab.active {
   color: var(--accent-yellow);
-  background: rgba(184, 134, 11, 0.06);
+  background: rgba(255, 215, 0, 0.06);
 }
 
 .admin-tab svg {
@@ -118,21 +118,21 @@
 }
 
 .stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.7), rgba(230, 240, 255, 0.6));
+  border: 1px solid rgba(200, 190, 240, 0.3);
   border-radius: var(--radius-md);
   padding: 24px;
   display: flex;
   align-items: center;
   gap: 16px;
   transition: all 0.3s ease;
-  box-shadow: 0 1px 3px rgba(62, 44, 35, 0.04);
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.04);
 }
 
 .stat-card:hover {
-  border-color: rgba(62, 44, 35, 0.15);
+  border-color: rgba(26, 29, 46, 0.15);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(62, 44, 35, 0.06);
+  box-shadow: 0 8px 24px rgba(26, 29, 46, 0.06);
 }
 
 .stat-card-icon {
@@ -145,10 +145,10 @@
   flex-shrink: 0;
 }
 
-.stat-card-icon.pink { background: rgba(139, 94, 60, 0.08); color: var(--accent-pink); }
-.stat-card-icon.cyan { background: rgba(160, 120, 76, 0.08); color: var(--accent-cyan); }
-.stat-card-icon.green { background: rgba(90, 114, 71, 0.08); color: var(--accent-green); }
-.stat-card-icon.yellow { background: rgba(184, 134, 11, 0.08); color: var(--accent-yellow); }
+.stat-card-icon.pink { background: rgba(255, 0, 228, 0.08); color: var(--accent-pink); }
+.stat-card-icon.cyan { background: rgba(51, 204, 255, 0.08); color: var(--accent-cyan); }
+.stat-card-icon.green { background: rgba(0, 228, 159, 0.08); color: var(--accent-green); }
+.stat-card-icon.yellow { background: rgba(255, 215, 0, 0.08); color: var(--accent-yellow); }
 
 .stat-card-value {
   font-size: 1.8rem;
@@ -166,12 +166,12 @@
 
 /* ─── DEPT BREAKDOWN ─── */
 .dept-breakdown {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.7), rgba(230, 240, 255, 0.6));
+  border: 1px solid rgba(200, 190, 240, 0.3);
   border-radius: var(--radius-lg);
   padding: 28px;
   margin-bottom: 28px;
-  box-shadow: 0 1px 3px rgba(62, 44, 35, 0.04);
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.04);
 }
 
 .dept-bars {
@@ -198,7 +198,7 @@
   flex: 1;
   height: 10px;
   border-radius: 100px;
-  background: rgba(232, 222, 209, 0.5);
+  background: rgba(226, 229, 236, 0.5);
   overflow: hidden;
 }
 
@@ -218,11 +218,11 @@
 
 /* ─── TABLES ─── */
 .recent-reg, .registrations-table-wrap {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.7), rgba(230, 240, 255, 0.6));
+  border: 1px solid rgba(200, 190, 240, 0.3);
   border-radius: var(--radius-lg);
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(62, 44, 35, 0.04);
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.04);
 }
 
 .recent-table-wrap {
@@ -259,7 +259,7 @@
 }
 
 .admin-table tr:hover td {
-  background: rgba(139, 94, 60, 0.02);
+  background: rgba(255, 0, 228, 0.02);
 }
 
 .admin-table .leader-cell {
@@ -285,12 +285,12 @@
 }
 
 .ps-tag.selected {
-  background: rgba(90, 114, 71, 0.08);
+  background: rgba(0, 228, 159, 0.08);
   color: var(--accent-green);
 }
 
 .ps-tag.pending {
-  background: rgba(156, 139, 128, 0.1);
+  background: rgba(136, 144, 165, 0.1);
   color: var(--text-tertiary);
 }
 
@@ -367,11 +367,11 @@
 
 /* ─── PS MANAGER ─── */
 .ps-manager {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
+  background: linear-gradient(135deg, rgba(240, 235, 255, 0.7), rgba(230, 240, 255, 0.6));
+  border: 1px solid rgba(200, 190, 240, 0.3);
   border-radius: var(--radius-lg);
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(62, 44, 35, 0.04);
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.04);
 }
 
 .ps-dept-selector {
@@ -399,7 +399,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-tertiary);
-  background: rgba(232, 222, 209, 0.4);
+  background: rgba(226, 229, 236, 0.4);
   border: 1px solid var(--border-card);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -407,19 +407,19 @@
 
 .dept-chip:hover {
   color: var(--text-secondary);
-  border-color: rgba(62, 44, 35, 0.15);
+  border-color: rgba(26, 29, 46, 0.15);
 }
 
 .dept-chip.active {
   color: var(--accent-yellow);
-  background: rgba(184, 134, 11, 0.06);
-  border-color: rgba(184, 134, 11, 0.2);
+  background: rgba(255, 215, 0, 0.06);
+  border-color: rgba(255, 215, 0, 0.2);
 }
 
 /* Add PS form */
 .add-ps-form {
   padding: 24px;
-  background: rgba(232, 222, 209, 0.3);
+  background: rgba(226, 229, 236, 0.3);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   margin-bottom: 24px;
@@ -482,8 +482,8 @@
   align-items: center;
   gap: 8px;
   padding: 10px 22px;
-  background: rgba(184, 134, 11, 0.08);
-  border: 1px solid rgba(184, 134, 11, 0.2);
+  background: rgba(255, 215, 0, 0.08);
+  border: 1px solid rgba(255, 215, 0, 0.2);
   border-radius: var(--radius-sm);
   font-family: var(--font-family);
   font-size: 0.85rem;
@@ -494,7 +494,7 @@
 }
 
 .btn-add-ps:hover {
-  background: rgba(184, 134, 11, 0.12);
+  background: rgba(255, 215, 0, 0.12);
   transform: translateY(-1px);
 }
 
@@ -510,14 +510,14 @@
   align-items: center;
   gap: 16px;
   padding: 16px 18px;
-  background: rgba(232, 222, 209, 0.2);
+  background: rgba(226, 229, 236, 0.2);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
 }
 
 .ps-item:hover {
-  background: rgba(232, 222, 209, 0.4);
+  background: rgba(226, 229, 236, 0.4);
   border-color: var(--border-card);
 }
 
@@ -531,7 +531,7 @@
   font-size: 0.8rem;
   font-weight: 800;
   color: var(--text-tertiary);
-  background: rgba(139, 94, 60, 0.04);
+  background: rgba(255, 0, 228, 0.04);
   flex-shrink: 0;
 }
 
@@ -563,7 +563,7 @@
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 100px;
-  background: rgba(90, 114, 71, 0.08);
+  background: rgba(0, 228, 159, 0.08);
   color: var(--accent-green);
   white-space: nowrap;
 }
@@ -583,9 +583,9 @@
 }
 
 .btn-delete-ps:hover {
-  background: rgba(192, 57, 43, 0.06);
-  border-color: rgba(192, 57, 43, 0.2);
-  color: #c0392b;
+  background: rgba(255, 68, 68, 0.06);
+  border-color: rgba(255, 68, 68, 0.2);
+  color: #ff4444;
 }
 
 /* ─── RESPONSIVE ─── */
