@@ -458,12 +458,12 @@ img {
 }
 
 .canvas-tl {
-  top: -400px;
+  top: -250px; /* Moved further down for better visibility */
   left: -400px;
 }
 
 .canvas-br {
-  bottom: -400px;
+  bottom: -400px; /* Moved back down to previous place */
   right: -400px;
 }
 
@@ -474,17 +474,17 @@ img {
 
 @media (max-width: 768px) {
   .canvas-container {
-    width: 400px;
-    height: 400px;
+    width: 900px;
+    height: 900px;
     z-index: 0;
   }
   .canvas-tl {
-    top: -200px;
-    left: -200px;
+    top: -300px; /* Moved significantly down to clear header on mobile */
+    left: -450px;
   }
   .canvas-br {
-    bottom: -200px;
-    right: -200px;
+    bottom: -400px; /* Moved back down */
+    right: -450px;
   }
 }
 
@@ -565,12 +565,13 @@ img {
 }
 
 .hero-title {
-  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-size: clamp(3.8rem, 10vw, 6rem); /* Further increased for mobile impact */
   font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.03em;
   margin-bottom: 24px;
   min-height: 1.15em;
+  opacity: 0; /* Hidden initially to fix loading glitch */
 }
 
 /* Typing cursor */
