@@ -132,17 +132,19 @@ function initGlobalNav() {
           margin-right: 8px;
         }
         .gnav-logo-main {
-          font-size: 0.9rem;
+          font-size: 0.95rem;
         }
         .gnav-logo-sub {
+          display: block !important;
           font-size: 0.45rem;
+          letter-spacing: 0.05em;
         }
         .gnav-controls {
-           gap: 6px;
+           gap: 8px;
         }
         .gnav-btn {
-          width: 32px;
-          height: 32px;
+          width: 34px;
+          height: 34px;
         }
         body:not(.landing-page) {
           padding-top: 75px !important;
@@ -150,12 +152,15 @@ function initGlobalNav() {
       }
 
       /* Extra Small Devices */
-      @media (max-width: 380px) {
-        .gnav-logo-sub {
-          display: none; /* Hide subtext to save space for nav icons */
-        }
+      @media (max-width: 400px) {
         .gnav-logo-main {
           font-size: 0.85rem;
+        }
+        .gnav-logo-sub {
+          font-size: 0.4rem;
+        }
+        .gnav-controls {
+           gap: 4px;
         }
         .gnav-btn {
           width: 30px;
