@@ -498,23 +498,23 @@ function initMindBlowingTitleReveal() {
       document.body.classList.remove('loading');
       const entranceTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
       entranceTl
-        .to(['#navbar', '.marquee-container'], { opacity: 1, duration: 1 })
-        .to('.hero-badge', { opacity: 1, y: 0, duration: 0.8 }, '-=0.5')
-        .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
-        .to('.hero-stats', { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
-        .to(['#departments', '#features', '#about', '.cta', 'footer'], { opacity: 1, duration: 1 }, '-=0.8');
+        .to(['#navbar', '.marquee-container'], { opacity: 1, duration: 0.6 })
+        .to('.hero-badge', { opacity: 1, y: 0, duration: 0.5 }, '-=0.4')
+        .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.5 }, '-=0.4')
+        .to('.hero-stats', { opacity: 1, y: 0, duration: 0.5 }, '-=0.4')
+        .to(['#departments', '#features', '#about', '.cta', 'footer'], { opacity: 1, duration: 0.6 }, '-=0.5');
     }
   });
 
   // Synchronized reveal: Fade in orbs and assemble title at the same time
   tl.to('.canvas-container', { 
     opacity: 1, 
-    duration: 2, 
+    duration: 1.2, 
     ease: 'power2.inOut' 
-  }, 0.5); // Slight lead-in delay for stability
+  }, 0.2); // Faster lead-in
 
   tl.to(spanArr, {
-    duration: 1.8,
+    duration: 1.2,
     opacity: 1,
     scale: 1,
     z: 0,
@@ -524,8 +524,8 @@ function initMindBlowingTitleReveal() {
     y: 0,
     filter: 'blur(0px)',
     ease: 'expo.out',
-    stagger: 0.06,
-  }, 0.5); // Start exactly with orb fade-in
+    stagger: 0.03,
+  }, 0.2); // Faster assemble speed
 }
 
 // ─── CARD TILT EFFECT ───
