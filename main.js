@@ -521,15 +521,6 @@ function initMindBlowingTitleReveal() {
     ease: 'expo.out',
     stagger: 0.08,
   });
-
-  // Make it glow hard
-  tl.to(spanArr, {
-    duration: 1.2,
-    textShadow: '0 0 25px rgba(255, 106, 0, 0.9)',
-    ease: 'power2.inOut',
-    yoyo: true,
-    repeat: 1
-  }, '-=0.5');
 }
 
 // ─── CARD TILT EFFECT ───
