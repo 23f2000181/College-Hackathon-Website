@@ -455,6 +455,7 @@ img {
   height: 800px;
   z-index: 0;
   pointer-events: none;
+  opacity: 0; /* Hidden initially for smooth fade-in */
 }
 
 .canvas-tl {

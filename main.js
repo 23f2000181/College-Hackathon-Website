@@ -506,10 +506,15 @@ function initMindBlowingTitleReveal() {
     }
   });
 
-  // Small initial delay so canvas can render before insane explosion
+  // Synchronized reveal: Fade in orbs and assemble title at the same time
+  tl.to('.canvas-container', { 
+    opacity: 1, 
+    duration: 2, 
+    ease: 'power2.inOut' 
+  }, 0.5); // Slight lead-in delay for stability
+
   tl.to(spanArr, {
-    delay: 0.8,
-    duration: 1.5,
+    duration: 1.8,
     opacity: 1,
     scale: 1,
     z: 0,
@@ -519,8 +524,8 @@ function initMindBlowingTitleReveal() {
     y: 0,
     filter: 'blur(0px)',
     ease: 'expo.out',
-    stagger: 0.08,
-  });
+    stagger: 0.06,
+  }, 0.5); // Start exactly with orb fade-in
 }
 
 // ─── CARD TILT EFFECT ───
