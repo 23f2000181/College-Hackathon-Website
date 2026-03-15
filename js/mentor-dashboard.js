@@ -195,11 +195,16 @@ async function loadSubmissions() {
 }
 
 // ─── ALL TEAMS ───
+let currentDeptFilter = 'all';
+
 async function loadAllTeams() {
-  const { data: teams } = await supabase
-    .from('teams')
-    .select('id, leader_name, department')
-    .eq('department', session.department);
+  let query = supabase.from('teams').select('id, leader_name, department');
+  
+  if (currentDeptFilter !== 'all') {
+    query = query.eq('department', currentDeptFilter);
+  }
+
+  const { data: teams } = await query;
 
   const list = document.getElementById('all-teams-list');
   const empty = document.getElementById('all-teams-empty');
@@ -241,6 +246,20 @@ async function loadAllTeams() {
   list.innerHTML = '';
   renderSubmissionCards(subs, teamsMap, reviewsMap, list);
 }
+
+// Attach filter listener
+document.addEventListener('DOMContentLoaded', () => {
+  const filterSelect = document.getElementById('all-teams-dept-filter');
+  if (filterSelect) {
+    // Optionally set default to the mentor's department initially
+    filterSelect.value = 'all';
+    
+    filterSelect.addEventListener('change', (e) => {
+      currentDeptFilter = e.target.value;
+      loadAllTeams();
+    });
+  }
+});
 
 // ─── WEEKLY REPORTS ───
 async function loadWeeklyReports() {

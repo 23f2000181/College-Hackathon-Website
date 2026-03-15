@@ -82,6 +82,19 @@
 
     <!-- All Teams Panel -->
     <section id="panel-all-teams" class="mentor-panel hidden fade-in stagger-2">
+      <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+        <label for="all-teams-dept-filter" style="color: var(--text-secondary); font-weight: 500;">Filter by Department:</label>
+        <select id="all-teams-dept-filter" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-family); min-width: 200px;">
+          <option value="all">All Departments</option>
+          <option value="cse">CSE</option>
+          <option value="cse-aiml">CSE - AIML</option>
+          <option value="cse-ds">CSE - DS</option>
+          <option value="ise">ISE</option>
+          <option value="ece">ECE</option>
+          <option value="mech">MECH</option>
+          <option value="civil">CIVIL</option>
+        </select>
+      </div>
       <div class="submissions-list" id="all-teams-list">
         <!-- Filled by JS -->
       </div>
