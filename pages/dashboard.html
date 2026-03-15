@@ -181,6 +181,24 @@
           </div>
         </div>
       </div>
+
+      <!-- Weekly Progress Reports Panel -->
+      <div class="dash-panel" id="reports-panel">
+        <div class="panel-header"><h2 class="panel-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Weekly Progress Reports
+        </h2></div>
+        
+        <div class="team-list" id="reports-list" style="overflow-y: auto; max-height: 250px;">
+          <div style="text-align: center; color: var(--text-tertiary); font-size: 0.9rem; margin-top: 20px;" id="no-reports-msg">No reports submitted yet.</div>
+        </div>
+
+        <div class="panel-footer" style="padding-top: 20px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 12px; margin-top: auto;">
+          <input type="number" id="report-week" placeholder="Week #" min="1" max="10" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-family);" />
+          <textarea id="report-text" placeholder="Write your weekly update..." rows="3" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-family); resize: vertical;"></textarea>
+          <button class="btn btn-primary" id="submit-report-btn" style="justify-content: center;">Submit Report</button>
+        </div>
+      </div>
     </section>
   </main>
 

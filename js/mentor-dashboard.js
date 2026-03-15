@@ -27,6 +27,7 @@ function initTabs() {
 
       if (tab.dataset.tab === 'my-teams') loadMyTeams();
       if (tab.dataset.tab === 'submissions') loadSubmissions();
+      if (tab.dataset.tab === 'weekly-reports') loadWeeklyReports();
       if (tab.dataset.tab === 'all-teams') loadAllTeams();
     });
   });
@@ -195,13 +196,29 @@ async function loadSubmissions() {
 
 // ─── ALL TEAMS ───
 async function loadAllTeams() {
-  const { data: subs } = await supabase
-    .from('submissions')
-    .select('*')
-    .order('submitted_at', { ascending: false });
+  const { data: teams } = await supabase
+    .from('teams')
+    .select('id, leader_name, department')
+    .eq('department', session.department);
 
   const list = document.getElementById('all-teams-list');
   const empty = document.getElementById('all-teams-empty');
+
+  if (!teams || teams.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  const teamIds = teams.map((t) => t.id);
+  const teamsMap = {};
+  teams.forEach((t) => (teamsMap[t.id] = t));
+
+  const { data: subs } = await supabase
+    .from('submissions')
+    .select('*')
+    .in('team_id', teamIds)
+    .order('submitted_at', { ascending: false });
 
   if (!subs || subs.length === 0) {
     list.innerHTML = '';
@@ -211,7 +228,51 @@ async function loadAllTeams() {
 
   empty.style.display = 'none';
 
-  const teamIds = subs.map((s) => s.team_id);
+  // Fetch my reviews
+  const { data: reviews } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('mentor_id', session.mentorId)
+    .in('team_id', teamIds);
+
+  const reviewsMap = {};
+  (reviews || []).forEach((r) => (reviewsMap[r.team_id] = r));
+
+  list.innerHTML = '';
+  renderSubmissionCards(subs, teamsMap, reviewsMap, list);
+}
+
+// ─── WEEKLY REPORTS ───
+async function loadWeeklyReports() {
+  const { data: assignments } = await supabase
+    .from('mentor_assignments')
+    .select('team_id')
+    .eq('mentor_id', session.mentorId);
+
+  const teamIds = (assignments || []).map((a) => a.team_id);
+  const list = document.getElementById('weekly-reports-list');
+  const empty = document.getElementById('weekly-reports-empty');
+
+  if (teamIds.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  const { data: reports } = await supabase
+    .from('weekly_reports')
+    .select('*')
+    .in('team_id', teamIds)
+    .order('submitted_at', { ascending: false });
+
+  if (!reports || reports.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+
   const { data: teams } = await supabase
     .from('teams')
     .select('id, leader_name, department')
@@ -220,17 +281,44 @@ async function loadAllTeams() {
   const teamsMap = {};
   (teams || []).forEach((t) => (teamsMap[t.id] = t));
 
-  // Fetch my reviews
-  const { data: reviews } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('mentor_id', session.mentorId);
-
-  const reviewsMap = {};
-  (reviews || []).forEach((r) => (reviewsMap[r.team_id] = r));
-
   list.innerHTML = '';
-  renderSubmissionCards(subs, teamsMap, reviewsMap, list);
+  reports.forEach(r => {
+    const team = teamsMap[r.team_id] || {};
+    const card = document.createElement('div');
+    card.className = 'submission-card';
+    card.style.marginBottom = '16px';
+    
+    let statusColor = '#ff6a00';
+    let statusBg = 'rgba(255,106,0,0.1)';
+    if (r.mentor_status === 'Approved') { statusColor = 'var(--accent-green)'; statusBg = 'rgba(0,228,159,0.1)'; }
+    if (r.mentor_status === 'Needs Revision') { statusColor = 'var(--accent-pink)'; statusBg = 'rgba(255,0,228,0.1)'; }
+    
+    card.innerHTML = `
+      <div class="submission-header" style="margin-bottom: 12px;">
+        <div>
+          <span class="submission-team">${team.leader_name || 'Unknown'}'s Team (Week ${r.week_number})</span>
+          <span class="team-card-dept" style="margin-left: 12px;">${DEPT_NAMES[team.department] || ''}</span>
+        </div>
+        <button class="btn-review btn-report-review" data-report-id="${r.id}" data-team-name="${team.leader_name || 'Unknown'}'s Team (Week ${r.week_number})" data-status="${r.mentor_status}" data-comment="${r.mentor_comment || ''}">
+          Review Report
+        </button>
+      </div>
+      <div class="submission-readme" style="margin-bottom: 12px; font-size: 0.95rem; color: var(--text-primary); border: 1px solid var(--border-subtle); background: var(--bg-primary); padding: 12px; border-radius: 8px;">
+        ${r.report_text}
+      </div>
+      <div style="display:flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 4px; background: ${statusBg}; color: ${statusColor}; text-transform: uppercase;">Status: ${r.mentor_status}</span>
+        ${r.mentor_comment ? `<span style="font-size: 0.85rem; color: var(--text-secondary);"><strong style="color:var(--accent-yellow);">Feedback:</strong> ${r.mentor_comment}</span>` : ''}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  list.querySelectorAll('.btn-report-review').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      openReportReviewModal(btn.dataset.reportId, btn.dataset.teamName, btn.dataset.status, btn.dataset.comment);
+    });
+  });
 }
 
 function renderSubmissionCards(subs, teamsMap, reviewsMap, container) {
@@ -387,4 +475,53 @@ document.getElementById('btn-submit-review').addEventListener('click', async () 
     if (activeTab.dataset.tab === 'submissions') loadSubmissions();
     if (activeTab.dataset.tab === 'all-teams') loadAllTeams();
   }
+});
+
+// ─── REPORT REVIEW MODAL ───
+let currentReportId = null;
+
+function openReportReviewModal(reportId, teamName, status, comment) {
+  currentReportId = reportId;
+  document.getElementById('report-team-name').textContent = teamName;
+  document.getElementById('report-mentor-status').value = status || 'Pending';
+  document.getElementById('report-mentor-comment').value = comment || '';
+  document.getElementById('review-report-modal').classList.add('active');
+}
+
+document.getElementById('close-review-report-modal').addEventListener('click', () => {
+  document.getElementById('review-report-modal').classList.remove('active');
+});
+
+document.getElementById('review-report-modal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('review-report-modal')) {
+    document.getElementById('review-report-modal').classList.remove('active');
+  }
+});
+
+document.getElementById('btn-submit-report-review').addEventListener('click', async () => {
+  if (!currentReportId) return;
+
+  const status = document.getElementById('report-mentor-status').value;
+  const comment = document.getElementById('report-mentor-comment').value.trim();
+
+  const btn = document.getElementById('btn-submit-report-review');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+
+  const { error } = await supabase
+    .from('weekly_reports')
+    .update({ mentor_status: status, mentor_comment: comment })
+    .eq('id', currentReportId);
+
+  btn.textContent = 'Submit Feedback';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Error saving feedback: ' + error.message, 'error');
+    return;
+  }
+
+  showToast('Report feedback saved successfully!', 'success');
+  document.getElementById('review-report-modal').classList.remove('active');
+  loadWeeklyReports();
 });

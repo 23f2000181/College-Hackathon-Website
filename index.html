@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 
-<body>
+<body class="loading">
   <!-- ─── NAVIGATION ─── -->
   <nav class="navbar" id="navbar">
     <a href="#" class="nav-logo">
@@ -50,9 +50,22 @@
     </ul>
   </div>
 
+  <!-- ─── MARQUEE ─── -->
+  <div class="marquee-container">
+    <div class="marquee-content">
+      <span class="marquee-item">📢 <strong>HackVerse Important Dates</strong> <span class="marquee-separator">|</span> <span class="marquee-highlight">16 March</span> – Problem Statements Launch <span class="marquee-separator">|</span> <span class="marquee-highlight">9–11 April</span> – HackVerse Hackathon Event</span>
+      <span class="marquee-item" aria-hidden="true">📢 <strong>HackVerse Important Dates</strong> <span class="marquee-separator">|</span> <span class="marquee-highlight">16 March</span> – Problem Statements Launch <span class="marquee-separator">|</span> <span class="marquee-highlight">9–11 April</span> – HackVerse Hackathon Event</span>
+    </div>
+  </div>
+
   <!-- ─── HERO SECTION ─── -->
   <section class="hero" id="hero">
-    <canvas id="hero-canvas"></canvas>
+    <div class="canvas-container canvas-tl">
+      <canvas id="hero-canvas-tl"></canvas>
+    </div>
+    <div class="canvas-container canvas-br">
+      <canvas id="hero-canvas-br"></canvas>
+    </div>
     <div class="hero-glow hero-glow-top"></div>
     <div class="hero-glow hero-glow-bottom"></div>
 
@@ -61,7 +74,7 @@
         <span class="badge-dot"></span>
         <span>Registration Open — March 2026</span>
       </div>
-      <h1 class="hero-title"><span id="hero-typed"></span><span class="typing-cursor">|</span></h1>
+      <h1 class="hero-title" id="main-title">HackVerse 2026</h1>
       <p class="hero-tagline">Where Innovation Meets Creativity</p>
       <div class="hero-stats">
         <div class="stat">

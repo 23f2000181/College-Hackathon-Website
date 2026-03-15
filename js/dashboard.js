@@ -2,6 +2,7 @@
    HackVerse — Dashboard Logic
    ═══════════════════════════════════════════════ */
 
+import { supabase } from '/js/supabase.js';
 import { requireAuth, getSelectedPS, initAppNav, DEPT_NAMES } from '/js/shared.js';
 
 const session = requireAuth();
@@ -44,6 +45,91 @@ if (session) {
         document.getElementById('chosen-ps-dept').textContent = DEPT_NAMES[selectedPS.department] || selectedPS.department;
       }
     }
+    
+    loadWeeklyReports();
+  }
+
+  async function loadWeeklyReports() {
+    const list = document.getElementById('reports-list');
+    const msg = document.getElementById('no-reports-msg');
+    
+    if (!list) return;
+
+    const { data: reports, error } = await supabase
+      .from('weekly_reports')
+      .select('*')
+      .eq('team_id', session.teamId)
+      .order('week_number', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching reports:', error);
+      return;
+    }
+
+    if (reports && reports.length > 0) {
+      if (msg) msg.style.display = 'none';
+      list.innerHTML = '';
+      reports.forEach(r => {
+        const item = document.createElement('div');
+        item.style.padding = '12px';
+        item.style.marginBottom = '10px';
+        item.style.borderRadius = '8px';
+        item.style.background = 'rgba(255,255,255,0.05)';
+        item.style.border = '1px solid var(--border-subtle)';
+        
+        let statusColor = '#ff6a00';
+        let statusBg = 'rgba(255,106,0,0.1)';
+        if (r.mentor_status === 'Approved') { statusColor = 'var(--accent-green)'; statusBg = 'rgba(0,228,159,0.1)'; }
+        if (r.mentor_status === 'Needs Revision') { statusColor = 'var(--accent-pink)'; statusBg = 'rgba(255,0,228,0.1)'; }
+
+        item.innerHTML = `
+          <div style="display:flex; justify-content: space-between; margin-bottom: 6px;">
+            <strong style="color:var(--accent-cyan);">Week ${r.week_number}</strong>
+            <span style="font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; background: ${statusBg}; color: ${statusColor}; text-transform: uppercase;">${r.mentor_status}</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:0;">${r.report_text}</p>
+          ${r.mentor_comment ? `<div style="font-size:0.8rem; margin-top:10px; border-top:1px solid var(--border-subtle); padding-top:6px; color:var(--text-primary);"><strong style="color:var(--accent-yellow);">Mentor:</strong> ${r.mentor_comment}</div>` : ''}
+        `;
+        list.appendChild(item);
+      });
+    } else {
+      list.innerHTML = '';
+      if (msg) list.appendChild(msg);
+      if (msg) msg.style.display = 'block';
+    }
+  }
+
+  const submitReportBtn = document.getElementById('submit-report-btn');
+  if (submitReportBtn) {
+    submitReportBtn.addEventListener('click', async () => {
+      const week = parseInt(document.getElementById('report-week').value);
+      const text = document.getElementById('report-text').value.trim();
+
+      if (!week || !text) {
+        alert('Please provide a valid week number and report content.');
+        return;
+      }
+
+      submitReportBtn.textContent = 'Submitting...';
+      submitReportBtn.disabled = true;
+
+      const { error } = await supabase
+        .from('weekly_reports')
+        .insert([{ team_id: session.teamId, week_number: week, report_text: text }]);
+
+      submitReportBtn.textContent = 'Submit Report';
+      submitReportBtn.disabled = false;
+
+      if (error) {
+        if (error.code === '23505') alert('You have already submitted a report for Week ' + week);
+        else alert('Failed to submit report. Please try again.');
+      } else {
+        document.getElementById('report-week').value = '';
+        document.getElementById('report-text').value = '';
+        alert('Weekly progress report submitted successfully!');
+        loadWeeklyReports();
+      }
+    });
   }
 
   loadDashboardData();

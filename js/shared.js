@@ -8,7 +8,7 @@ import { supabase } from '/js/supabase.js';
 // ─── SESSION CHECK ───
 export function requireAuth() {
   const session = getSession();
-  if (!session) {
+  if (!session || session.isMentor || session.isAdmin) {
     window.location.href = '/login.html';
     return null;
   }
@@ -106,6 +106,10 @@ export async function getAllPS() {
 
 export function logout() {
   localStorage.removeItem('hackverse_session');
+  localStorage.removeItem('hackverse_teams');
+  Object.keys(localStorage).forEach(k => {
+    if (k.startsWith('hackverse_selected_ps_')) localStorage.removeItem(k);
+  });
   window.location.href = '/';
 }
 

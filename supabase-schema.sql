@@ -187,3 +187,23 @@ CREATE POLICY "public_select_reviews" ON reviews FOR SELECT USING (true);
 CREATE POLICY "public_insert_reviews" ON reviews FOR INSERT WITH CHECK (true);
 CREATE POLICY "public_update_reviews" ON reviews FOR UPDATE USING (true);
 CREATE POLICY "public_delete_reviews" ON reviews FOR DELETE USING (true);
+
+-- 8. Weekly Progress Reports
+CREATE TABLE IF NOT EXISTS weekly_reports (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+  week_number INT NOT NULL,
+  report_text TEXT NOT NULL,
+  mentor_status TEXT DEFAULT 'Pending' CHECK (mentor_status IN ('Pending', 'Approved', 'Needs Revision')),
+  mentor_comment TEXT,
+  submitted_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(team_id, week_number)
+);
+
+ALTER TABLE weekly_reports ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "public_select_weekly_reports" ON weekly_reports FOR SELECT USING (true);
+CREATE POLICY "public_insert_weekly_reports" ON weekly_reports FOR INSERT WITH CHECK (true);
+CREATE POLICY "public_update_weekly_reports" ON weekly_reports FOR UPDATE USING (true);
+CREATE POLICY "public_delete_weekly_reports" ON weekly_reports FOR DELETE USING (true);
+

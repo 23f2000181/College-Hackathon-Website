@@ -9,8 +9,8 @@ import { supabase } from '/js/supabase.js';
 
 // ─── THREE.JS 3D HERO SCENE ───
 class HeroScene {
-  constructor() {
-    this.canvas = document.getElementById('hero-canvas');
+  constructor(canvasId) {
+    this.canvas = document.getElementById(canvasId);
     if (!this.canvas) return;
 
     this.mouse = { x: 0, y: 0 };
@@ -31,8 +31,12 @@ class HeroScene {
     // Scene
     this.scene = new THREE.Scene();
 
+    const parent = this.canvas.parentElement;
+    const width = parent.clientWidth || 800;
+    const height = parent.clientHeight || 800;
+
     // Camera
-    const aspect = window.innerWidth / window.innerHeight;
+    const aspect = width / height;
     this.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 100);
     this.camera.position.z = window.innerWidth < 768 ? 9 : 6;
 
@@ -42,7 +46,7 @@ class HeroScene {
       alpha: true,
       antialias: true,
     });
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // Lights — neon palette
@@ -250,10 +254,12 @@ class HeroScene {
     });
 
     window.addEventListener('resize', () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
+      const parent = this.canvas.parentElement;
+      if (!parent) return;
+      const width = parent.clientWidth;
+      const height = parent.clientHeight;
       this.camera.aspect = width / height;
-      this.camera.position.z = width < 768 ? 9 : 6;
+      this.camera.position.z = window.innerWidth < 768 ? 9 : 6;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(width, height);
     });
@@ -306,7 +312,7 @@ class HeroScene {
     if (this.particleSystem) {
       const positions = this.particleSystem.geometry.attributes.position.array;
       for (let i = 0; i < positions.length; i += 3) {
-        positions[i + 1] += Math.sin(elapsed + i) * 0.001;
+        positions[i + 1] += Math.sin(elapsed * 2 + i) * 0.01;
       }
       this.particleSystem.geometry.attributes.position.needsUpdate = true;
       this.particleSystem.rotation.y = elapsed * 0.02;
@@ -447,60 +453,83 @@ function initSmoothScroll() {
   });
 }
 
-// ─── HERO TYPING ANIMATION ───
-function initHeroTyping() {
-  const container = document.getElementById('hero-typed');
-  const cursor = document.querySelector('.typing-cursor');
-  if (!container) return;
+// ─── MIND BLOWING TITLE AND HERO PAGE REVEAL ───
+function initMindBlowingTitleReveal() {
+  const title = document.getElementById('main-title');
+  if (!title) return;
 
-  const fullText = 'HackVerse 2026';
-  const gradientStart = 10; // index where '2026' starts
-  let charIndex = 0;
-
-  function typeNextChar() {
-    if (charIndex >= fullText.length) {
-      // Typing complete
-      if (cursor) cursor.classList.add('done');
-      return;
-    }
-
-    const char = fullText[charIndex];
+  const text = title.textContent;
+  title.innerHTML = '';
+  title.style.opacity = 1;
+  title.style.transform = 'none';
+  title.style.filter = 'none';
+  
+  const spanArr = [];
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
     const span = document.createElement('span');
-
     if (char === ' ') {
       span.innerHTML = '&nbsp;';
       span.style.display = 'inline-block';
-      span.style.width = '0.3em';
     } else {
       span.textContent = char;
-      span.className = 'typed-char';
-      // Apply gradient class for '2026'
-      if (charIndex >= gradientStart) {
-        span.classList.add('is-gradient');
-      }
+      span.style.display = 'inline-block';
+      if (i >= 10) span.classList.add('is-gradient');
     }
-
-    container.appendChild(span);
-    charIndex++;
-
-    // Variable timing — slightly randomized like real typing
-    const delay = 120 + Math.random() * 60;
-    setTimeout(typeNextChar, delay);
+    title.appendChild(span);
+    spanArr.push(span);
   }
 
-  // Start typing after a brief delay for the badge to appear
-  setTimeout(typeNextChar, 800);
-}
+  // Set initial 3D transform for individual letters
+  gsap.set(spanArr, {
+    opacity: 0,
+    scale: 4,
+    z: 200,
+    rotationX: () => Math.random() * 500 - 250,
+    rotationY: () => Math.random() * 500 - 250,
+    y: () => (Math.random() - 0.5) * 600,
+    x: () => (Math.random() - 0.5) * 600,
+    filter: 'blur(20px)'
+  });
 
-// ─── HERO ENTRANCE ANIMATION ───
-function initHeroAnimation() {
-  const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+  const tl = gsap.timeline({
+    onComplete: () => {
+      // Begin Hero Page Reveal
+      document.body.classList.remove('loading');
+      const entranceTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      entranceTl
+        .to(['#navbar', '.marquee-container'], { opacity: 1, duration: 1 })
+        .to('.hero-badge', { opacity: 1, y: 0, duration: 0.8 }, '-=0.5')
+        .to('.hero-tagline', { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
+        .to('.hero-stats', { opacity: 1, y: 0, duration: 0.8 }, '-=0.6')
+        .to(['#departments', '#features', '#about', '.cta', 'footer'], { opacity: 1, duration: 1 }, '-=0.8');
+    }
+  });
 
-  timeline
-    .from('.hero-badge', { opacity: 0, y: 20, duration: 0.8, delay: 0.3 })
-    .from('.hero-tagline', { opacity: 0, y: 20, duration: 0.7 }, '+=0.8')
-    .from('.stat', { opacity: 0, y: 20, duration: 0.5, stagger: 0.1 }, '-=0.3')
-    .from('.stat-divider', { opacity: 0, scaleY: 0, duration: 0.4, stagger: 0.1 }, '-=0.5');
+  // Small initial delay so canvas can render before insane explosion
+  tl.to(spanArr, {
+    delay: 0.8,
+    duration: 1.5,
+    opacity: 1,
+    scale: 1,
+    z: 0,
+    rotationX: 0,
+    rotationY: 0,
+    x: 0,
+    y: 0,
+    filter: 'blur(0px)',
+    ease: 'expo.out',
+    stagger: 0.08,
+  });
+
+  // Make it glow hard
+  tl.to(spanArr, {
+    duration: 1.2,
+    textShadow: '0 0 25px rgba(255, 106, 0, 0.9)',
+    ease: 'power2.inOut',
+    yoyo: true,
+    repeat: 1
+  }, '-=0.5');
 }
 
 // ─── CARD TILT EFFECT ───
@@ -636,7 +665,7 @@ function initScrollSpy() {
         }
       });
     },
-    { threshold: 0.3, rootMargin: '-80px 0px -50% 0px' }
+    { threshold: 0.15, rootMargin: '-100px 0px -50% 0px' }
   );
 
   sections.forEach((section) => observer.observe(section));
@@ -674,13 +703,13 @@ function initRulesModal() {
 // ─── INITIALIZE EVERYTHING ───
 document.addEventListener('DOMContentLoaded', async () => {
   await loadDynamicStats();
-  new HeroScene();
+  new HeroScene('hero-canvas-tl');
+  new HeroScene('hero-canvas-br');
   initNavbar();
   initScrollReveal();
   initStatCounters();
   initSmoothScroll();
-  initHeroTyping();
-  initHeroAnimation();
+  initMindBlowingTitleReveal();
   initCardTilt();
   initSectionLabels();
   initScrollSpy();
