@@ -133,7 +133,7 @@ a { text-decoration: none; color: inherit; }
   flex-direction: column;
   line-height: 1.15;
 }
-.side-logo .logo-main { font-size: 1.2rem; font-weight: 900; color: #FF7A33; letter-spacing: 0.08em; }
+.side-logo .logo-main { font-size: 1.2rem; font-weight: 900; color: #FF7A33 !important; letter-spacing: 0.08em; }
 .side-logo .logo-sub { font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.12em; }
 
 .side-tagline {
@@ -682,20 +682,33 @@ a { text-decoration: none; color: inherit; }
 
   .auth-side-panel {
     flex: none;
-    padding: 40px 24px 32px;
+    padding: 32px 24px;
     min-height: auto;
+    background: transparent;
+  }
+  
+  .auth-side-panel::after { display: none; }
+
+  .side-logo {
+    display: none; /* Hidden on mobile as it's in the fixed header */
   }
 
-  .side-features {
-    display: none;
+  .side-tagline {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+
+  .side-desc {
+    font-size: 0.95rem;
+    margin-bottom: 24px;
   }
 
   .auth-form-panel {
-    padding: 24px;
+    padding: 24px 16px;
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
+  .form-header {
+    margin-bottom: 24px;
   }
 
   .form-title {

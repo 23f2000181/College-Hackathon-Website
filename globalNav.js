@@ -1,131 +1,186 @@
 /**
  * Global Navigation Control
- * Adds Back, Home, and Forward buttons to ALL pages in the top-right corner.
+ * Synchronizes header look across all pages to match the landing page.
+ * Replaces login/register actions with Back, Home, and Forward navigation.
  */
 function initGlobalNav() {
-  const path = window.location.pathname;
-  
-  // Prevent duplicate insertion
-  if (document.querySelector('.global-control-nav')) return;
+  const isLandingPage = window.location.pathname === '/' || 
+                        window.location.pathname === '/index.html' || 
+                        window.location.pathname.endsWith('/index.html') ||
+                        document.querySelector('.hero');
 
-  const navDiv = document.createElement('div');
-  navDiv.className = 'global-control-nav';
-  
-  navDiv.innerHTML = `
-    <button class="gnav-btn" onclick="window.history.back()" title="Go Back">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-    </button>
-    <a href="/" class="gnav-btn" title="Go Home">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
-    </a>
-    <button class="gnav-btn" onclick="window.history.forward()" title="Go Forward">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14"/>
-        <path d="m12 5 7 7-7 7"/>
-      </svg>
-    </button>
-  `;
-
-  document.body.appendChild(navDiv);
-
-  // Inject Styles
-  if (!document.getElementById('global-nav-style')) {
+  // 1. Enforce Orange Logo Branding Everywhere
+  const styleTagId = 'global-nav-branding-style';
+  if (!document.getElementById(styleTagId)) {
     const style = document.createElement('style');
-    style.id = 'global-nav-style';
+    style.id = styleTagId;
     style.textContent = `
-      .global-control-nav {
+      .logo-main, .gnav-logo-main { color: #FF7A33 !important; }
+      
+      /* Internal Page Specific Styles */
+      body:not(.landing-page) .app-nav, 
+      body:not(.landing-page) .auth-navbar, 
+      body:not(.landing-page) .navbar:not(.gnav-navbar) {
+        display: none !important;
+      }
+
+      body:not(.landing-page) {
+        padding-top: 85px !important;
+      }
+
+      /* Unified Navbar Styles */
+      .gnav-navbar {
         position: fixed;
-        top: 80px; /* Positioned below the typical header height */
-        right: 24px;
-        z-index: 10000;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
         display: flex;
-        gap: 8px;
         align-items: center;
-        background: rgba(255, 255, 255, 0.8);
+        justify-content: space-between;
+        padding: 16px 40px;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        padding: 5px 12px;
-        border-radius: 100px;
-        border: 1px solid rgba(255, 122, 51, 0.2);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        animation: gnav-fade-in 0.5s ease-out;
+        background: rgba(248, 249, 252, 0.85);
+        border-bottom: 1px solid rgba(26, 29, 46, 0.08);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: 'Outfit', sans-serif;
       }
 
-      @keyframes gnav-fade-in {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+      .gnav-logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
       }
-      
+
+      .gnav-college-logo {
+        height: 42px;
+        width: auto;
+        margin-right: 12px;
+        border-radius: 50%;
+        box-shadow: 0 2px 10px rgba(26, 29, 46, 0.1);
+      }
+
+      .gnav-logo-text-group {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.15;
+      }
+
+      .gnav-logo-main {
+        font-size: 1.1rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+      }
+
+      .gnav-logo-sub {
+        font-size: 0.55rem;
+        font-weight: 600;
+        color: #4A5068;
+        letter-spacing: 0.12em;
+      }
+
+      .gnav-controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
       .gnav-btn {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
         color: #1a1d2e;
-        text-decoration: none;
-        background: transparent;
-        border: none;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(26, 29, 46, 0.1);
+        border-radius: 50%;
         cursor: pointer;
         transition: all 0.25s ease;
-        border-radius: 50%;
       }
-      
+
       .gnav-btn:hover {
-        background: rgba(255, 122, 51, 0.08); /* Use orange for hover */
+        background: rgba(255, 122, 51, 0.15);
         color: #FF7A33;
-        transform: scale(1.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 122, 51, 0.15);
       }
       
       .gnav-btn:active {
-        transform: scale(0.92);
-      }
-  
-      @media (max-width: 768px) {
-        .global-control-nav {
-           top: 70px;
-           right: 16px;
-           gap: 4px;
-           padding: 4px 8px;
-           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        .gnav-btn {
-           width: 30px;
-           height: 30px;
-        }
-        .gnav-btn svg {
-           width: 17px;
-           height: 17px;
-        }
+        transform: scale(0.95);
       }
 
-      /* Dark mode/Hero page compatibility */
-      body.hero-page .global-control-nav {
-        background: rgba(15, 15, 25, 0.5);
-        border-color: rgba(255, 122, 51, 0.3);
-      }
-      body.hero-page .gnav-btn {
-        color: #fff;
+      @media (max-width: 768px) {
+        .gnav-navbar {
+          padding: 10px 16px;
+          height: 64px;
+        }
+        .gnav-college-logo {
+          height: 32px;
+          margin-right: 8px;
+        }
+        .gnav-logo-main {
+          font-size: 0.95rem;
+        }
+        .gnav-logo-sub {
+          display: none; /* Keep it clean on mobile */
+        }
+        .gnav-controls {
+           gap: 6px;
+        }
+        .gnav-btn {
+          width: 34px;
+          height: 34px;
+        }
+        body:not(.landing-page) {
+          padding-top: 70px !important;
+        }
       }
     `;
     document.head.appendChild(style);
   }
+
+  if (isLandingPage) {
+    document.body.classList.add('landing-page');
+    // Ensure landing page navbar is visible if it was hidden by previous scripts
+    const landingNav = document.querySelector('.navbar');
+    if (landingNav) landingNav.style.display = 'flex';
+    return;
+  }
+
+  // 2. Create and Inject the Unified Navbar for Internal Pages
+  if (!document.querySelector('.gnav-navbar')) {
+    const nav = document.createElement('nav');
+    nav.className = 'gnav-navbar';
+    nav.innerHTML = `
+      <a href="/" class="gnav-logo">
+        <img src="/logo.jpeg" alt="SVIT Logo" class="gnav-college-logo" />
+        <div class="gnav-logo-text-group">
+          <span class="gnav-logo-main">SAI VIDYA</span>
+          <span class="gnav-logo-sub">INSTITUTE OF TECHNOLOGY</span>
+        </div>
+      </a>
+      <div class="gnav-controls">
+        <button class="gnav-btn" onclick="window.history.back()" title="Back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </button>
+        <a href="/" class="gnav-btn" title="Home">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </a>
+        <button class="gnav-btn" onclick="window.history.forward()" title="Forward">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </div>
+    `;
+    document.body.prepend(nav);
+  }
 }
 
-// Handle auto-initialization
+// Ensure it runs as early as possible and after DOM is ready
+initGlobalNav();
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initGlobalNav);
 } else {
   initGlobalNav();
-}
-
-// Export for module systems
-if (typeof exports !== 'undefined') {
-  exports.initGlobalNav = initGlobalNav;
 }
