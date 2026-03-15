@@ -133,7 +133,7 @@ a { text-decoration: none; color: inherit; }
   flex-direction: column;
   line-height: 1.15;
 }
-.side-logo .logo-main { font-size: 1.2rem; font-weight: 900; color: var(--text-primary); letter-spacing: 0.08em; }
+.side-logo .logo-main { font-size: 1.2rem; font-weight: 900; color: #FF7A33; letter-spacing: 0.08em; }
 .side-logo .logo-sub { font-size: 0.65rem; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.12em; }
 
 .side-tagline {
