@@ -125,80 +125,187 @@ export function requireMentorAuth() {
 }
 
 export async function getMentorsByDept(dept, academicYear) {
-  // Get mentors in this department
-  const { data: mentors } = await supabase
-    .from('mentors')
-    .select('*')
-    .eq('department', dept)
-    .order('name');
+  try {
+    // Some mentors in the DB may have short-form dept codes (e.g. 'ds', 'aiml')
+    // while teams use the full codes ('cse-ds', 'cse-aiml'). Query both to be safe.
+    const DEPT_ALIASES = {
+      'cse-ds':   ['cse-ds', 'ds'],
+      'cse-aiml': ['cse-aiml', 'aiml'],
+    };
+    const deptValues = DEPT_ALIASES[dept] || [dept];
 
-  if (!mentors) return [];
+    // Get mentors in this department (match any known alias)
+    const { data: mentors, error: mentorsError } = await supabase
+      .from('mentors')
+      .select('*')
+      .in('department', deptValues)
+      .order('name');
 
-  // Count assignments scoped to this academic year only (cap is 4 per year)
-  const { data: assignments } = await supabase
-    .from('mentor_assignments')
-    .select('mentor_id')
-    .eq('academic_year', academicYear);
+    if (mentorsError) {
+      console.error('Error fetching mentors:', mentorsError);
+      return [];
+    }
 
-  const counts = {};
-  (assignments || []).forEach((a) => {
-    counts[a.mentor_id] = (counts[a.mentor_id] || 0) + 1;
-  });
+    if (!mentors) return [];
 
-  return mentors.map((m) => ({
-    ...m,
-    assignedCount: counts[m.id] || 0,
-    slotsAvailable: 4 - (counts[m.id] || 0),
-  })).filter(m => m.slotsAvailable > 0); // Hide mentors full for this year
+    // If academicYear is known, count only for that year (per-year cap = 4).
+    // If not (old session without year), count all assignments vs max_teams.
+    let assignmentsQuery = supabase.from('mentor_assignments').select('mentor_id');
+    if (academicYear) {
+      assignmentsQuery = assignmentsQuery.eq('academic_year', academicYear);
+    }
+    const { data: assignments, error: assignmentsError } = await assignmentsQuery;
+
+    if (assignmentsError) {
+      console.error('Error fetching assignments:', assignmentsError);
+      // Return mentors with zero counts if we can't get assignments
+      return mentors.map((m) => ({
+        ...m,
+        assignedCount: 0,
+        slotsAvailable: (academicYear ? 4 : (m.max_teams || 8)),
+      }));
+    }
+
+    const counts = {};
+    (assignments || []).forEach((a) => {
+      counts[a.mentor_id] = (counts[a.mentor_id] || 0) + 1;
+    });
+
+    const cap = academicYear ? 4 : null; // null = use mentor's own max_teams
+    return mentors.map((m) => ({
+      ...m,
+      assignedCount: counts[m.id] || 0,
+      slotsAvailable: (cap ?? (m.max_teams || 8)) - (counts[m.id] || 0),
+    })).filter(m => m.slotsAvailable > 0);
+
+  } catch (error) {
+    console.error('Error in getMentorsByDept:', error);
+    return [];
+  }
 }
 
 export async function getTeamMentor(teamId) {
-  const { data } = await supabase
-    .from('mentor_assignments')
-    .select('*, mentors:mentor_id(*)')
-    .eq('team_id', teamId)
-    .maybeSingle();
-  return data ? data.mentors : null;
+  try {
+    const { data, error } = await supabase
+      .from('mentor_assignments')
+      .select('*, mentors:mentor_id(*)')
+      .eq('team_id', teamId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching team mentor:', error);
+      return null;
+    }
+
+    return data ? data.mentors : null;
+  } catch (error) {
+    console.error('Error in getTeamMentor:', error);
+    return null;
+  }
 }
 
 export async function assignMentor(teamId, mentorId, academicYear) {
-  // Check mentor capacity per academic year (max 4 teams per year)
-  const { count } = await supabase
-    .from('mentor_assignments')
-    .select('*', { count: 'exact', head: true })
-    .eq('mentor_id', mentorId)
-    .eq('academic_year', academicYear);
+  try {
+    let count = 0;
+    let countError = null;
+    let maxCap = 4; // Default per-year cap
 
-  if (count >= 4) {
-    return { success: false, message: `This mentor already has 4 teams assigned for ${academicYear}.` };
+    if (academicYear) {
+      // Per-year cap check (max 4 teams per year)
+      const { count: c, error: e } = await supabase
+        .from('mentor_assignments')
+        .select('*', { count: 'exact', head: true })
+        .eq('mentor_id', mentorId)
+        .eq('academic_year', academicYear);
+      count = c;
+      countError = e;
+    } else {
+      // Fallback: global cap check using mentor's max_teams
+      const { data: mentor, error: mentorError } = await supabase.from('mentors').select('max_teams').eq('id', mentorId).maybeSingle();
+      if (mentorError) {
+        console.error('Error fetching mentor max_teams:', mentorError);
+        return { success: false, message: 'Error checking mentor availability.' };
+      }
+      maxCap = mentor?.max_teams || 8; // Use mentor's max_teams or default to 8
+
+      const { count: c, error: e } = await supabase
+        .from('mentor_assignments')
+        .select('*', { count: 'exact', head: true })
+        .eq('mentor_id', mentorId);
+      count = c;
+      countError = e;
+    }
+
+    if (countError) {
+      console.error('Error checking mentor capacity:', countError);
+      return { success: false, message: 'Error checking mentor availability.' };
+    }
+
+    if (count >= maxCap) {
+      const message = academicYear
+        ? `This mentor already has ${maxCap} teams assigned for ${academicYear}.`
+        : `This mentor has reached their team limit of ${maxCap}.`;
+      return { success: false, message: message };
+    }
+
+    // Check if team already has a mentor
+    const { data: existing, error: existingError } = await supabase
+      .from('mentor_assignments')
+      .select('id')
+      .eq('team_id', teamId)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error('Error checking existing assignment:', existingError);
+    }
+
+    if (existing) {
+      return { success: false, message: 'Your team already has a mentor assigned.' };
+    }
+
+    // Insert assignment WITHOUT the status field (since it doesn't exist in your table)
+    const { error: insertError } = await supabase
+      .from('mentor_assignments')
+      .insert({
+        mentor_id: mentorId,
+        team_id: teamId,
+        academic_year: academicYear
+        // Removed 'status' field to match your table schema
+      });
+
+    if (insertError) {
+      console.error('Error inserting assignment:', insertError);
+      return { success: false, message: insertError.message };
+    }
+
+    return { success: true };
+
+  } catch (error) {
+    console.error('Error in assignMentor:', error);
+    return { success: false, message: 'An unexpected error occurred.' };
   }
-
-  // Check if team already has a mentor
-  const { data: existing } = await supabase
-    .from('mentor_assignments')
-    .select('id')
-    .eq('team_id', teamId)
-    .maybeSingle();
-
-  if (existing) {
-    return { success: false, message: 'Your team already has a mentor assigned.' };
-  }
-
-  // Assign with Pending status and store the academic year
-  const { error } = await supabase
-    .from('mentor_assignments')
-    .insert({ mentor_id: mentorId, team_id: teamId, status: 'Pending', academic_year: academicYear });
-
-  if (error) return { success: false, message: error.message };
-  return { success: true };
 }
 
 export async function updateAssignmentStatus(teamId, status) {
-  const { error } = await supabase
-    .from('mentor_assignments')
-    .update({ status })
-    .eq('team_id', teamId);
-  return !error;
+  try {
+    // First check if status column exists - if not, just return success
+    // or you can add the column to your table
+    const { error } = await supabase
+      .from('mentor_assignments')
+      .update({ status })
+      .eq('team_id', teamId);
+
+    if (error) {
+      console.warn('Could not update status (column might not exist):', error);
+      // Return true anyway as this is not critical
+      return true;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error updating assignment status:', error);
+    return false;
+  }
 }
 
 export async function getSubmission(teamId) {

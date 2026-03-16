@@ -112,6 +112,7 @@ async function renderOverview() {
       tr.innerHTML = `
         <td class="leader-cell">${team.leader_name}</td>
         <td>${DEPT_NAMES[team.department] || team.department}</td>
+        <td><span style="font-size:0.78rem;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(99,102,241,0.12);color:#818cf8;">${team.academic_year || '—'}</span></td>
         <td>4</td>
         <td>${formatDate(team.registered_at)}</td>
       `;
@@ -203,6 +204,7 @@ async function renderRegistrations() {
       <td>${team.email}</td>
       <td>${team.phone || '—'}</td>
       <td>${DEPT_NAMES[team.department] || team.department}</td>
+      <td><span style="font-size:0.78rem;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(99,102,241,0.12);color:#818cf8;">${team.academic_year || '—'}</span></td>
       <td class="members-cell">${members.join(', ') || '—'}</td>
       <td class="ps-cell">${ps ? `<span class="ps-tag selected">${ps.title}</span>` : '<span class="ps-tag pending">Not selected</span>'}</td>
       <td>${formatDate(team.registered_at)}</td>

@@ -49,6 +49,16 @@
 
     <!-- My Teams Panel -->
     <section id="panel-my-teams" class="mentor-panel fade-in stagger-2">
+      <div style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <label for="year-filter-my-teams" style="color:var(--text-secondary); font-weight:500; font-size:0.9rem;">Filter by Year:</label>
+        <select id="year-filter-my-teams" style="padding:8px 12px; border-radius:8px; border:1px solid var(--border-subtle); background:var(--bg-primary); color:var(--text-primary); font-family:var(--font-family);">
+          <option value="all">All Years</option>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
+        </select>
+      </div>
       <div class="teams-grid" id="my-teams-grid">
         <!-- Filled by JS -->
       </div>
@@ -60,6 +70,16 @@
 
     <!-- Submissions Panel -->
     <section id="panel-submissions" class="mentor-panel hidden fade-in stagger-2">
+      <div style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+        <label for="year-filter-submissions" style="color:var(--text-secondary); font-weight:500; font-size:0.9rem;">Filter by Year:</label>
+        <select id="year-filter-submissions" style="padding:8px 12px; border-radius:8px; border:1px solid var(--border-subtle); background:var(--bg-primary); color:var(--text-primary); font-family:var(--font-family);">
+          <option value="all">All Years</option>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
+        </select>
+      </div>
       <div class="submissions-list" id="submissions-list">
         <!-- Filled by JS -->
       </div>
@@ -82,9 +102,9 @@
 
     <!-- All Teams Panel -->
     <section id="panel-all-teams" class="mentor-panel hidden fade-in stagger-2">
-      <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-        <label for="all-teams-dept-filter" style="color: var(--text-secondary); font-weight: 500;">Filter by Department:</label>
-        <select id="all-teams-dept-filter" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-family); min-width: 200px;">
+      <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; flex-wrap:wrap;">
+        <label for="all-teams-dept-filter" style="color: var(--text-secondary); font-weight: 500;">Dept:</label>
+        <select id="all-teams-dept-filter" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-family);">
           <option value="all">All Departments</option>
           <option value="cse">CSE</option>
           <option value="cse-aiml">CSE - AIML</option>
@@ -93,6 +113,14 @@
           <option value="ece">ECE</option>
           <option value="mech">MECH</option>
           <option value="civil">CIVIL</option>
+        </select>
+        <label for="year-filter-all-teams" style="color: var(--text-secondary); font-weight: 500; margin-left:8px;">Year:</label>
+        <select id="year-filter-all-teams" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-family);">
+          <option value="all">All Years</option>
+          <option value="1st Year">1st Year</option>
+          <option value="2nd Year">2nd Year</option>
+          <option value="3rd Year">3rd Year</option>
+          <option value="4th Year">4th Year</option>
         </select>
       </div>
       <div class="submissions-list" id="all-teams-list">
@@ -134,8 +162,9 @@
           <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--text-secondary);">Status</label>
           <select id="report-mentor-status" style="width:100%;padding:10px;margin-bottom:16px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-primary);color:var(--text-primary);font-family:var(--font-family);">
             <option value="Pending">Pending</option>
-            <option value="Approved">Approved</option>
-            <option value="Needs Revision">Needs Revision</option>
+            <option value="Approved">Approved ✓</option>
+            <option value="Needs Revision">Needs Revision ⚠️</option>
+            <option value="Rejected">Rejected ✕</option>
           </select>
           <label style="display:block;margin-bottom:8px;font-weight:600;color:var(--text-secondary);">Feedback Comments</label>
           <textarea class="review-textarea" id="report-mentor-comment" placeholder="Leave constructive feedback..." rows="4"></textarea>

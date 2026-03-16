@@ -68,23 +68,26 @@
       <span>🎓</span>
       <p>No mentors available in your department yet.</p>
     </div>
+  </main>
 
-    <!-- Confirmation Modal -->
-    <div class="modal-overlay" id="confirm-modal">
-      <div class="modal-content">
-        <button class="modal-close" id="close-confirm-modal">✕</button>
-        <h2 class="modal-title">Confirm Mentor Selection</h2>
-        <p class="modal-subtitle" id="confirm-mentor-name"></p>
-        <p style="color: var(--text-secondary); font-size:0.9rem; margin-bottom:24px; line-height:1.6;">
-          Are you sure you want to select this mentor? This action may be restricted later.
+  <!-- Confirmation Modal — must be outside <main> so position:fixed is viewport-relative -->
+  <div id="confirm-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:20px;">
+    <div style="max-width:440px; width:100%; background:var(--bg-secondary); border:1px solid var(--border-subtle); border-radius:16px; padding:32px; position:relative; box-shadow:0 24px 60px rgba(0,0,0,0.5);">
+      <button id="close-confirm-modal" style="position:absolute; top:16px; right:16px; background:none; border:none; color:var(--text-tertiary); font-size:1.3rem; cursor:pointer; line-height:1; padding:4px;">✕</button>
+      <h2 style="margin:0 0 8px; font-size:1.25rem; color:var(--text-primary);">Confirm Mentor Selection</h2>
+      <p id="confirm-mentor-name" style="margin:0 0 16px; color:var(--text-secondary); font-size:0.95rem;"></p>
+      <div style="display:flex; align-items:flex-start; gap:10px; background:rgba(255,160,0,0.08); border:1px solid rgba(255,160,0,0.25); border-radius:10px; padding:12px 14px; margin-bottom:24px;">
+        <span style="font-size:1.1rem; flex-shrink:0;">⚠️</span>
+        <p style="color:#f59e0b; font-size:0.88rem; font-weight:600; margin:0; line-height:1.5;">
+          This selection is <strong>permanent and cannot be changed</strong> after confirmation. Please choose carefully.
         </p>
-        <div style="display:flex; gap:12px;">
-          <button class="btn-submit-review" id="btn-confirm-select" style="flex:1;">Confirm Selection</button>
-          <button class="btn-submit-review" id="btn-cancel-select" style="flex:1; background: var(--bg-tertiary); color: var(--text-primary);">Cancel</button>
-        </div>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <button class="btn-submit-review" id="btn-confirm-select" style="flex:1;">Confirm Selection</button>
+        <button class="btn-submit-review" id="btn-cancel-select" style="flex:1; background:var(--bg-tertiary); color:var(--text-primary);">Cancel</button>
       </div>
     </div>
-  </main>
+  </div>
 
   <script src="/globalNav.js"></script>
   <script type="module" src="/js/mentors.js"></script>

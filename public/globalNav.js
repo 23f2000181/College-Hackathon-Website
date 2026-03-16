@@ -178,10 +178,12 @@ function initGlobalNav() {
         </div>
       `;
     } else {
+      // Not on a dashboard page OR no session — show back controls + login link only if not logged in
+      const isLoggedIn = !!session;
       rightHtml = `
         <div class="gnav-right">
           ${controlsHtml}
-          ${path.includes('login.html') ? '' : '<a href="/login.html" class="gnav-logout" style="color:#FF7A33; border-color:rgba(255,122,51,0.2); background:rgba(255,122,51,0.05); height: 36px; padding: 0 16px;">Log In</a>'}
+          ${(!isLoggedIn && !path.includes('login.html')) ? '<a href="/login.html" class="gnav-logout" style="color:#FF7A33; border-color:rgba(255,122,51,0.2); background:rgba(255,122,51,0.05); height: 36px; padding: 0 16px;">Log In</a>' : ''}
         </div>
       `;
     }

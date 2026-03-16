@@ -33,15 +33,39 @@ function initTabs() {
   });
 }
 
+// ─── YEAR FILTER STATE ───
+let yearFilterMyTeams = 'all';
+let yearFilterSubmissions = 'all';
+let yearFilterAllTeams = 'all';
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('year-filter-my-teams')?.addEventListener('change', (e) => {
+    yearFilterMyTeams = e.target.value;
+    loadMyTeams();
+  });
+  document.getElementById('year-filter-submissions')?.addEventListener('change', (e) => {
+    yearFilterSubmissions = e.target.value;
+    loadSubmissions();
+  });
+  document.getElementById('year-filter-all-teams')?.addEventListener('change', (e) => {
+    yearFilterAllTeams = e.target.value;
+    loadAllTeams();
+  });
+});
+
 // ─── MY TEAMS ───
 async function loadMyTeams() {
-  const { data: assignments } = await supabase
+  const { data: assignments, error: assignError } = await supabase
     .from('mentor_assignments')
-    .select('team_id, status')
+    .select('*')
     .eq('mentor_id', session.mentorId);
 
+  if (assignError) {
+    console.error('Error loading assignments:', assignError);
+  }
+
   const assignmentsMap = {};
-  (assignments || []).forEach(a => assignmentsMap[a.team_id] = a.status);
+  (assignments || []).forEach(a => assignmentsMap[a.team_id] = a.status || 'Pending');
   const teamIds = Object.keys(assignmentsMap);
   const grid = document.getElementById('my-teams-grid');
   const empty = document.getElementById('my-teams-empty');
@@ -54,10 +78,10 @@ async function loadMyTeams() {
 
   empty.style.display = 'none';
 
-  // Fetch teams (include academic_year)
+  // Fetch teams
   const { data: teams } = await supabase
     .from('teams')
-    .select('*, academic_year')
+    .select('*')
     .in('id', teamIds);
 
   // Fetch members
@@ -94,7 +118,17 @@ async function loadMyTeams() {
 
   grid.innerHTML = '';
 
-  (teams || []).forEach((team) => {
+  // Apply year filter (client-side on already-fetched teams)
+  const filteredTeams = (teams || []).filter((team) =>
+    yearFilterMyTeams === 'all' || team.academic_year === yearFilterMyTeams
+  );
+
+  if (filteredTeams.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+
+  filteredTeams.forEach((team) => {
     const members = membersByTeam[team.id] || [];
     const ps = psByTeam[team.id];
     const hasSubmitted = submittedTeams.has(team.id);
@@ -102,7 +136,7 @@ async function loadMyTeams() {
     const teamStatus = assignmentsMap[team.id];
 
     const card = document.createElement('div');
-    card.className = `team-card ${teamStatus === 'Pending' ? 'status-pending' : teamStatus === 'Rejected' ? 'status-rejected' : 'status-approved'}`;
+    card.className = 'team-card status-approved';
     card.innerHTML = `
       <div class="team-card-header">
         <span class="team-card-name">${team.leader_name}'s Team</span>
@@ -117,47 +151,18 @@ async function loadMyTeams() {
         <strong>Project Details:</strong> ${ps ? ps.title : 'No problem statement selected yet.'}
       </div>
       <div class="team-card-status">
-        <div style="display:flex; flex-direction:column; gap:4px;">
-           <span class="status-badge ${teamStatus === 'Approved' ? 'submitted' : teamStatus === 'Rejected' ? 'pending' : 'pending'}" style="${teamStatus === 'Rejected' ? 'color:#ff4444; background:rgba(255,68,68,0.1);' : ''}">
-             ${teamStatus === 'Approved' ? '✓ Approved' : teamStatus === 'Rejected' ? '✕ Rejected' : '⏳ Pending Approval'}
-           </span>
-        </div>
-        
-        <div class="team-card-actions" style="display:flex; gap:8px;">
-          ${teamStatus === 'Pending' ? `
-            <button class="btn-review btn-approve" data-team-id="${team.id}" style="background:var(--accent-green); color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Approve</button>
-            <button class="btn-review btn-reject" data-team-id="${team.id}" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Reject</button>
-          ` : teamStatus === 'Approved' ? `
-            <button class="btn-review" data-team-id="${team.id}" data-team-name="${team.leader_name}'s Team">Write Review</button>
-          ` : `
-            <button class="btn-review btn-approve" data-team-id="${team.id}" style="background:var(--accent-green); color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Re-Approve</button>
-          `}
+        <span class="status-badge submitted">✓ Assigned</span>
+        <div class="team-card-actions" style="display:flex; gap:8px; margin-top:8px;">
+          <button class="btn-review" data-team-id="${team.id}" data-team-name="${team.leader_name}'s Team">Write Review</button>
         </div>
       </div>
     `;
     grid.appendChild(card);
   });
 
-  // Action handlers
-  grid.querySelectorAll('.btn-approve').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const ok = await updateAssignmentStatus(btn.dataset.teamId, 'Approved');
-      if (ok) { showToast('Team Approved!'); loadMyTeams(); }
-    });
-  });
-
-  grid.querySelectorAll('.btn-reject').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (!confirm('Reject this team?')) return;
-      const ok = await updateAssignmentStatus(btn.dataset.teamId, 'Rejected');
-      if (ok) { showToast('Team Rejected', 'error'); loadMyTeams(); }
-    });
-  });
-
   // Review button handlers
   grid.querySelectorAll('.btn-review').forEach((btn) => {
     btn.addEventListener('click', () => {
-       if (btn.classList.contains('btn-approve') || btn.classList.contains('btn-reject')) return;
        openReviewModal(btn.dataset.teamId, btn.dataset.teamName);
     });
   });
@@ -165,12 +170,11 @@ async function loadMyTeams() {
 
 // ─── SUBMISSIONS ───
 async function loadSubmissions() {
-  // Get my assigned team IDs
+  // Get my assigned team IDs (show all, not just 'Approved')
   const { data: assignments } = await supabase
     .from('mentor_assignments')
     .select('team_id')
-    .eq('mentor_id', session.mentorId)
-    .eq('status', 'Approved');
+    .eq('mentor_id', session.mentorId);
 
   const teamIds = (assignments || []).map((a) => a.team_id);
   const list = document.getElementById('submissions-list');
@@ -217,8 +221,23 @@ async function loadSubmissions() {
   const reviewsMap = {};
   (reviews || []).forEach((r) => (reviewsMap[r.team_id] = r));
 
+  // Apply year filter to the submissions before rendering
+  const filteredTeamsMap = {};
+  Object.entries(teamsMap).forEach(([id, t]) => {
+    if (yearFilterSubmissions === 'all' || t.academic_year === yearFilterSubmissions) {
+      filteredTeamsMap[id] = t;
+    }
+  });
+  const filteredSubs = subs.filter(s => filteredTeamsMap[s.team_id]);
+
+  if (filteredSubs.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
   list.innerHTML = '';
-  renderSubmissionsByYear(subs, teamsMap, reviewsMap, list);
+  renderSubmissionsByYear(filteredSubs, filteredTeamsMap, reviewsMap, list);
 }
 
 // ─── ALL TEAMS ───
@@ -226,9 +245,12 @@ let currentDeptFilter = 'all';
 
 async function loadAllTeams() {
   let query = supabase.from('teams').select('id, leader_name, department, academic_year');
-  
+
   if (currentDeptFilter !== 'all') {
     query = query.eq('department', currentDeptFilter);
+  }
+  if (yearFilterAllTeams !== 'all') {
+    query = query.eq('academic_year', yearFilterAllTeams);
   }
 
   const { data: teams } = await query;
@@ -359,8 +381,7 @@ async function loadWeeklyReports() {
   const { data: assignments } = await supabase
     .from('mentor_assignments')
     .select('team_id')
-    .eq('mentor_id', session.mentorId)
-    .eq('status', 'Approved');
+    .eq('mentor_id', session.mentorId);
 
   const teamIds = (assignments || []).map((a) => a.team_id);
   const list = document.getElementById('weekly-reports-list');
@@ -405,6 +426,7 @@ async function loadWeeklyReports() {
     let statusBg = 'rgba(255,106,0,0.1)';
     if (r.mentor_status === 'Approved') { statusColor = 'var(--accent-green)'; statusBg = 'rgba(0,228,159,0.1)'; }
     if (r.mentor_status === 'Needs Revision') { statusColor = 'var(--accent-pink)'; statusBg = 'rgba(255,0,228,0.1)'; }
+    if (r.mentor_status === 'Rejected') { statusColor = '#ff4444'; statusBg = 'rgba(255,68,68,0.1)'; }
     
     card.innerHTML = `
       <div class="submission-header" style="margin-bottom: 12px;">
