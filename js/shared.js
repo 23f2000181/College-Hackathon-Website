@@ -226,6 +226,26 @@ export async function getAllMentors() {
   return data || [];
 }
 
+export async function getTeamReviews(teamId) {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select(`
+      id,
+      feedback,
+      rating,
+      reviewed_at,
+      mentors ( name, department )
+    `)
+    .eq('team_id', teamId)
+    .order('reviewed_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching reviews:', error);
+    return [];
+  }
+  return data || [];
+}
+
 // ─── POPULATE NAV (shared across all app pages) ───
 export function initAppNav(session) {
   if (!session) return;
