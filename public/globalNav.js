@@ -91,7 +91,7 @@ function initGlobalNav() {
   
   if (!document.querySelector('.gnav-navbar')) {
     const nav = document.createElement('nav');
-    nav.className = 'gnav-navbar' + (isDashboard ? ' dashboard-mode' : '');
+    nav.className = 'gnav-navbar ' + (isDashboard ? 'dashboard-mode' : 'simple');
     
     // Left: Branding
     const left = `
