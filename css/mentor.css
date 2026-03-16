@@ -69,6 +69,10 @@
   transform: translateY(-2px);
 }
 
+.team-card.status-pending { border-left: 4px solid var(--accent-yellow); }
+.team-card.status-approved { border-left: 4px solid var(--accent-green); }
+.team-card.status-rejected { border-left: 4px solid #ff4444; opacity: 0.8; }
+
 .team-card-header {
   display: flex;
   align-items: center;

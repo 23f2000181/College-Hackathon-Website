@@ -147,8 +147,8 @@ export async function getMentorsByDept(dept) {
   return mentors.map((m) => ({
     ...m,
     assignedCount: counts[m.id] || 0,
-    slotsAvailable: (m.max_teams || 4) - (counts[m.id] || 0),
-  }));
+    slotsAvailable: (m.max_teams || 5) - (counts[m.id] || 0),
+  })).filter(m => m.slotsAvailable > 0); // Hide if no slots available
 }
 
 export async function getTeamMentor(teamId) {
@@ -167,8 +167,8 @@ export async function assignMentor(teamId, mentorId) {
     .select('*', { count: 'exact', head: true })
     .eq('mentor_id', mentorId);
 
-  if (count >= 4) {
-    return { success: false, message: 'This mentor already has 4 teams assigned.' };
+  if (count >= 5) {
+    return { success: false, message: 'This mentor already has 5 teams assigned.' };
   }
 
   // Check if team already has a mentor
@@ -182,13 +182,21 @@ export async function assignMentor(teamId, mentorId) {
     return { success: false, message: 'Your team already has a mentor assigned.' };
   }
 
-  // Assign
+  // Assign with Pending status
   const { error } = await supabase
     .from('mentor_assignments')
-    .insert({ mentor_id: mentorId, team_id: teamId });
+    .insert({ mentor_id: mentorId, team_id: teamId, status: 'Pending' });
 
   if (error) return { success: false, message: error.message };
   return { success: true };
+}
+
+export async function updateAssignmentStatus(teamId, status) {
+  const { error } = await supabase
+    .from('mentor_assignments')
+    .update({ status })
+    .eq('team_id', teamId);
+  return !error;
 }
 
 export async function getSubmission(teamId) {
