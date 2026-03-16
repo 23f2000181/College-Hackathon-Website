@@ -75,6 +75,15 @@ function initGlobalNav() {
         .gnav-logo-text, .gnav-user-text { display: none; }
         .gnav-navbar { padding: 0 15px; }
       }
+
+      /* Push page content below the fixed navbar on all non-landing pages */
+      body:not(.landing-page) {
+        padding-top: 64px !important;
+      }
+      /* Auth pages (register/login) are full-height flex layouts — shift them too */
+      body:not(.landing-page) .auth-page {
+        min-height: calc(100vh - 64px);
+      }
     `;
     document.head.appendChild(style);
   }
