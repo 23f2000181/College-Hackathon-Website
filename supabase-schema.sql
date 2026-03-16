@@ -3,6 +3,19 @@
 -- Run this in Supabase SQL Editor (Dashboard → SQL Editor → New Query)
 -- ═══════════════════════════════════════════════
 
+-- ─────────────────────────────────────────────
+-- MIGRATION: Run these first if the tables already exist
+-- (Safe to run even if academic_year column is not yet present)
+-- ─────────────────────────────────────────────
+-- ALTER TABLE teams
+--   ADD COLUMN IF NOT EXISTS academic_year TEXT NOT NULL DEFAULT '3rd Year'
+--     CHECK (academic_year IN ('1st Year', '2nd Year', '3rd Year', '4th Year'));
+--
+-- ALTER TABLE mentor_assignments
+--   ADD COLUMN IF NOT EXISTS academic_year TEXT NOT NULL DEFAULT '3rd Year'
+--     CHECK (academic_year IN ('1st Year', '2nd Year', '3rd Year', '4th Year'));
+-- ─────────────────────────────────────────────
+
 -- 1. Create Tables
 -- ─────────────────────────────────────────────
 
@@ -14,6 +27,8 @@ CREATE TABLE IF NOT EXISTS teams (
   phone TEXT NOT NULL,
   department TEXT NOT NULL,
   department_label TEXT,
+  academic_year TEXT NOT NULL DEFAULT '3rd Year'
+    CHECK (academic_year IN ('1st Year', '2nd Year', '3rd Year', '4th Year')),
   password TEXT NOT NULL,
   registered_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -135,6 +150,8 @@ CREATE TABLE IF NOT EXISTS mentor_assignments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE,
   team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+  academic_year TEXT NOT NULL DEFAULT '3rd Year'
+    CHECK (academic_year IN ('1st Year', '2nd Year', '3rd Year', '4th Year')),
   status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
   assigned_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(team_id)  -- each team gets exactly one mentor

@@ -64,8 +64,8 @@ async function loadMentors() {
       DEPT_NAMES[existingMentor.department] || existingMentor.department;
   }
 
-  // Get mentors for this department
-  const mentors = await getMentorsByDept(session.department);
+  // Get mentors for this department, scoped to the team's academic year
+  const mentors = await getMentorsByDept(session.department, session.academic_year);
 
   if (mentors.length === 0) {
     grid.innerHTML = '';
@@ -105,7 +105,7 @@ async function loadMentors() {
       <div class="team-card-status" style="margin-top: 16px;">
         <div>
           <span class="status-badge ${isFull ? 'pending' : 'submitted'}">
-            ${mentor.assignedCount}/${mentor.max_teams || 4} teams
+            ${mentor.assignedCount}/4 teams
           </span>
           ${isFull ? '<span style="color:var(--text-tertiary); font-size:0.82rem; margin-left:8px;">Full</span>' : ''}
         </div>
@@ -154,7 +154,7 @@ document.getElementById('btn-confirm-select').addEventListener('click', async ()
   btn.disabled = true;
   btn.textContent = 'Assigning...';
 
-  const result = await assignMentor(session.teamId, selectedMentorId);
+  const result = await assignMentor(session.teamId, selectedMentorId, session.academic_year);
 
   if (result.success) {
     showToast('Mentor assigned successfully!', 'success');

@@ -15,6 +15,7 @@ const member1Input = document.getElementById('member-1');
 const member2Input = document.getElementById('member-2');
 const member3Input = document.getElementById('member-3');
 const member4Input = document.getElementById('member-4');
+const academicYearSelect = document.getElementById('academic-year');
 const teamCountEl = document.getElementById('team-count');
 const submitBtn = document.getElementById('submit-btn');
 
@@ -132,6 +133,13 @@ function validateForm() {
     isValid = false;
   }
 
+  // Academic Year
+  if (!academicYearSelect.value) {
+    academicYearSelect.classList.add('error');
+    document.getElementById('academic-year-error').classList.add('visible');
+    isValid = false;
+  }
+
   // Password
   if (!passwordInput.value || passwordInput.value.length < 6) {
     showError('password', 'password-error');
@@ -230,6 +238,7 @@ form.addEventListener('submit', async (e) => {
       email: emailInput.value.trim().toLowerCase(),
       department: departmentSelect.value,
       department_label: departmentSelect.options[departmentSelect.selectedIndex].text,
+      academic_year: academicYearSelect.value,
       password: passwordInput.value,
     })
     .select()
@@ -304,6 +313,11 @@ fieldsWithErrors.forEach(([inputId, errorId]) => {
 departmentSelect.addEventListener('change', () => {
   departmentSelect.classList.remove('error');
   document.getElementById('department-error').classList.remove('visible');
+});
+
+academicYearSelect.addEventListener('change', () => {
+  academicYearSelect.classList.remove('error');
+  document.getElementById('academic-year-error').classList.remove('visible');
 });
 
 // ─── INITIAL STATE ───

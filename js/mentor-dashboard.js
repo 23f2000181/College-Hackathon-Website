@@ -54,10 +54,10 @@ async function loadMyTeams() {
 
   empty.style.display = 'none';
 
-  // Fetch teams
+  // Fetch teams (include academic_year)
   const { data: teams } = await supabase
     .from('teams')
-    .select('*')
+    .select('*, academic_year')
     .in('id', teamIds);
 
   // Fetch members
@@ -106,7 +106,10 @@ async function loadMyTeams() {
     card.innerHTML = `
       <div class="team-card-header">
         <span class="team-card-name">${team.leader_name}'s Team</span>
-        <span class="team-card-dept">${DEPT_NAMES[team.department] || team.department}</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <span class="status-badge" style="background:rgba(99,102,241,0.15); color:#818cf8; font-size:0.72rem;">${team.academic_year || '—'}</span>
+          <span class="team-card-dept">${DEPT_NAMES[team.department] || team.department}</span>
+        </div>
       </div>
       <div class="team-card-members">
         <strong>Leader:</strong> ${team.leader_name}<br/>
@@ -194,11 +197,11 @@ async function loadSubmissions() {
 
   empty.style.display = 'none';
 
-  // Fetch team names
+  // Fetch team names and academic year
   const subTeamIds = subs.map((s) => s.team_id);
   const { data: teams } = await supabase
     .from('teams')
-    .select('id, leader_name, department')
+    .select('id, leader_name, department, academic_year')
     .in('id', subTeamIds);
 
   const teamsMap = {};
@@ -215,14 +218,14 @@ async function loadSubmissions() {
   (reviews || []).forEach((r) => (reviewsMap[r.team_id] = r));
 
   list.innerHTML = '';
-  renderSubmissionCards(subs, teamsMap, reviewsMap, list);
+  renderSubmissionsByYear(subs, teamsMap, reviewsMap, list);
 }
 
 // ─── ALL TEAMS ───
 let currentDeptFilter = 'all';
 
 async function loadAllTeams() {
-  let query = supabase.from('teams').select('id, leader_name, department');
+  let query = supabase.from('teams').select('id, leader_name, department, academic_year');
   
   if (currentDeptFilter !== 'all') {
     query = query.eq('department', currentDeptFilter);
@@ -257,7 +260,7 @@ async function loadAllTeams() {
 
   empty.style.display = 'none';
 
-  // Fetch my reviews
+  // Fetch mentor's reviews for these teams
   const { data: reviews } = await supabase
     .from('reviews')
     .select('*')
@@ -268,7 +271,73 @@ async function loadAllTeams() {
   (reviews || []).forEach((r) => (reviewsMap[r.team_id] = r));
 
   list.innerHTML = '';
-  renderSubmissionCards(subs, teamsMap, reviewsMap, list);
+  renderSubmissionsByYear(subs, teamsMap, reviewsMap, list);
+}
+
+// ─── RENDER SUBMISSIONS GROUPED BY ACADEMIC YEAR ───
+function renderSubmissionsByYear(subs, teamsMap, reviewsMap, container) {
+  // Sort submissions so that 1st/2nd/3rd/4th year appear in order
+  const yearOrder = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+  const sorted = [...subs].sort((a, b) => {
+    const ya = yearOrder.indexOf((teamsMap[a.team_id] || {}).academic_year) ?? 99;
+    const yb = yearOrder.indexOf((teamsMap[b.team_id] || {}).academic_year) ?? 99;
+    return ya - yb;
+  });
+
+  let lastYear = null;
+  sorted.forEach((sub) => {
+    const team = teamsMap[sub.team_id] || {};
+    const year = team.academic_year || 'Unknown Year';
+
+    // Inject section header when year changes
+    if (year !== lastYear) {
+      const header = document.createElement('div');
+      header.style.cssText = 'margin: 28px 0 12px; padding: 8px 14px; background: rgba(99,102,241,0.12); border-left: 3px solid #818cf8; border-radius: 4px; font-weight: 700; color: #818cf8; font-size: 0.9rem; letter-spacing: 0.03em;';
+      header.textContent = `── ${year} Teams ──`;
+      container.appendChild(header);
+      lastYear = year;
+    }
+
+    const review = reviewsMap[sub.team_id];
+    const card = document.createElement('div');
+    card.className = 'submission-card';
+    card.innerHTML = `
+      <div class="submission-header">
+        <div>
+          <span class="submission-team">${team.leader_name || 'Unknown'}'s Team</span>
+          <span class="status-badge" style="margin-left:8px; background:rgba(99,102,241,0.15); color:#818cf8; font-size:0.72rem;">${year}</span>
+          <span class="team-card-dept" style="margin-left: 8px;">${DEPT_NAMES[team.department] || ''}</span>
+        </div>
+        <button class="btn-review" data-team-id="${sub.team_id}" data-team-name="${team.leader_name || 'Unknown'}'s Team">
+          ${review ? 'Update Review' : 'Write Review'}
+        </button>
+      </div>
+      <div class="submission-links">
+        <a href="${sub.github_url}" target="_blank" class="submission-link github">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          GitHub Repo
+        </a>
+        <a href="${sub.youtube_url}" target="_blank" class="submission-link youtube">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+          YouTube Demo
+        </a>
+      </div>
+      <div class="submission-readme">${sub.readme_desc}</div>
+      ${review ? `
+        <div class="submission-review-existing">
+          <div class="review-label">Your Review</div>
+          <div class="review-rating-display">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+          <div class="review-text">${review.feedback}</div>
+        </div>
+      ` : ''}
+    `;
+    container.appendChild(card);
+  });
+
+  // Wire up review buttons
+  container.querySelectorAll('.btn-review').forEach((btn) => {
+    btn.addEventListener('click', () => openReviewModal(btn.dataset.teamId, btn.dataset.teamName));
+  });
 }
 
 // Attach filter listener

@@ -124,8 +124,8 @@ export function requireMentorAuth() {
   return session;
 }
 
-export async function getMentorsByDept(dept) {
-  // Get mentors
+export async function getMentorsByDept(dept, academicYear) {
+  // Get mentors in this department
   const { data: mentors } = await supabase
     .from('mentors')
     .select('*')
@@ -134,10 +134,11 @@ export async function getMentorsByDept(dept) {
 
   if (!mentors) return [];
 
-  // Get assignment counts
+  // Count assignments scoped to this academic year only (cap is 4 per year)
   const { data: assignments } = await supabase
     .from('mentor_assignments')
-    .select('mentor_id');
+    .select('mentor_id')
+    .eq('academic_year', academicYear);
 
   const counts = {};
   (assignments || []).forEach((a) => {
@@ -147,8 +148,8 @@ export async function getMentorsByDept(dept) {
   return mentors.map((m) => ({
     ...m,
     assignedCount: counts[m.id] || 0,
-    slotsAvailable: (m.max_teams || 5) - (counts[m.id] || 0),
-  })).filter(m => m.slotsAvailable > 0); // Hide if no slots available
+    slotsAvailable: 4 - (counts[m.id] || 0),
+  })).filter(m => m.slotsAvailable > 0); // Hide mentors full for this year
 }
 
 export async function getTeamMentor(teamId) {
@@ -160,15 +161,16 @@ export async function getTeamMentor(teamId) {
   return data ? data.mentors : null;
 }
 
-export async function assignMentor(teamId, mentorId) {
-  // Check mentor capacity
+export async function assignMentor(teamId, mentorId, academicYear) {
+  // Check mentor capacity per academic year (max 4 teams per year)
   const { count } = await supabase
     .from('mentor_assignments')
     .select('*', { count: 'exact', head: true })
-    .eq('mentor_id', mentorId);
+    .eq('mentor_id', mentorId)
+    .eq('academic_year', academicYear);
 
-  if (count >= 5) {
-    return { success: false, message: 'This mentor already has 5 teams assigned.' };
+  if (count >= 4) {
+    return { success: false, message: `This mentor already has 4 teams assigned for ${academicYear}.` };
   }
 
   // Check if team already has a mentor
@@ -182,10 +184,10 @@ export async function assignMentor(teamId, mentorId) {
     return { success: false, message: 'Your team already has a mentor assigned.' };
   }
 
-  // Assign with Pending status
+  // Assign with Pending status and store the academic year
   const { error } = await supabase
     .from('mentor_assignments')
-    .insert({ mentor_id: mentorId, team_id: teamId, status: 'Pending' });
+    .insert({ mentor_id: mentorId, team_id: teamId, status: 'Pending', academic_year: academicYear });
 
   if (error) return { success: false, message: error.message };
   return { success: true };

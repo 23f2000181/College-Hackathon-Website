@@ -179,6 +179,7 @@ form.addEventListener('submit', async (e) => {
       email: team.email,
       department: team.department,
       departmentLabel: team.department_label,
+      academic_year: team.academic_year,
       usn: team.usn,
       phone: team.phone,
       members: members,
