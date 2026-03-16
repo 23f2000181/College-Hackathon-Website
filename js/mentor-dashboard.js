@@ -3,7 +3,7 @@
    ═══════════════════════════════════════════════ */
 
 import { supabase } from '/js/supabase.js';
-import { requireMentorAuth, initAppNav, showToast, DEPT_NAMES } from '/js/shared.js';
+import { requireMentorAuth, initAppNav, showToast, DEPT_NAMES, updateAssignmentStatus } from '/js/shared.js';
 
 const session = requireMentorAuth();
 if (session) {
@@ -37,10 +37,12 @@ function initTabs() {
 async function loadMyTeams() {
   const { data: assignments } = await supabase
     .from('mentor_assignments')
-    .select('team_id')
+    .select('team_id, status')
     .eq('mentor_id', session.mentorId);
 
-  const teamIds = (assignments || []).map((a) => a.team_id);
+  const assignmentsMap = {};
+  (assignments || []).forEach(a => assignmentsMap[a.team_id] = a.status);
+  const teamIds = Object.keys(assignmentsMap);
   const grid = document.getElementById('my-teams-grid');
   const empty = document.getElementById('my-teams-empty');
 
@@ -97,43 +99,64 @@ async function loadMyTeams() {
     const ps = psByTeam[team.id];
     const hasSubmitted = submittedTeams.has(team.id);
 
+    const teamStatus = assignmentsMap[team.id];
+
     const card = document.createElement('div');
-    card.className = 'team-card';
+    card.className = `team-card ${teamStatus === 'Pending' ? 'status-pending' : teamStatus === 'Rejected' ? 'status-rejected' : 'status-approved'}`;
     card.innerHTML = `
       <div class="team-card-header">
         <span class="team-card-name">${team.leader_name}'s Team</span>
         <span class="team-card-dept">${DEPT_NAMES[team.department] || team.department}</span>
       </div>
       <div class="team-card-members">
-        <strong>Members:</strong><br/>
-        ${[team.leader_name, ...members].join(', ') || '—'}
+        <strong>Leader:</strong> ${team.leader_name}<br/>
+        <strong>Members:</strong> ${members.join(', ') || '—'}<br/>
+        <strong>Project Details:</strong> ${ps ? ps.title : 'No problem statement selected yet.'}
       </div>
-      ${ps ? `
-        <div class="team-card-ps">
-          <div class="team-card-ps-label">Problem Statement</div>
-          <div class="team-card-ps-title">${ps.title}</div>
-        </div>
-      ` : `
-        <div class="team-card-ps">
-          <div class="team-card-ps-label">Problem Statement</div>
-          <div class="team-card-ps-title" style="color: var(--text-tertiary);">Not selected yet</div>
-        </div>
-      `}
       <div class="team-card-status">
-        <span class="status-badge ${hasSubmitted ? 'submitted' : 'pending'}">
-          ${hasSubmitted ? '✓ Submitted' : '⏳ Pending'}
-        </span>
-        <button class="btn-review" data-team-id="${team.id}" data-team-name="${team.leader_name}'s Team">
-          Write Review
-        </button>
+        <div style="display:flex; flex-direction:column; gap:4px;">
+           <span class="status-badge ${teamStatus === 'Approved' ? 'submitted' : teamStatus === 'Rejected' ? 'pending' : 'pending'}" style="${teamStatus === 'Rejected' ? 'color:#ff4444; background:rgba(255,68,68,0.1);' : ''}">
+             ${teamStatus === 'Approved' ? '✓ Approved' : teamStatus === 'Rejected' ? '✕ Rejected' : '⏳ Pending Approval'}
+           </span>
+        </div>
+        
+        <div class="team-card-actions" style="display:flex; gap:8px;">
+          ${teamStatus === 'Pending' ? `
+            <button class="btn-review btn-approve" data-team-id="${team.id}" style="background:var(--accent-green); color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Approve</button>
+            <button class="btn-review btn-reject" data-team-id="${team.id}" style="background:#ff4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Reject</button>
+          ` : teamStatus === 'Approved' ? `
+            <button class="btn-review" data-team-id="${team.id}" data-team-name="${team.leader_name}'s Team">Write Review</button>
+          ` : `
+            <button class="btn-review btn-approve" data-team-id="${team.id}" style="background:var(--accent-green); color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">Re-Approve</button>
+          `}
+        </div>
       </div>
     `;
     grid.appendChild(card);
   });
 
+  // Action handlers
+  grid.querySelectorAll('.btn-approve').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const ok = await updateAssignmentStatus(btn.dataset.teamId, 'Approved');
+      if (ok) { showToast('Team Approved!'); loadMyTeams(); }
+    });
+  });
+
+  grid.querySelectorAll('.btn-reject').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Reject this team?')) return;
+      const ok = await updateAssignmentStatus(btn.dataset.teamId, 'Rejected');
+      if (ok) { showToast('Team Rejected', 'error'); loadMyTeams(); }
+    });
+  });
+
   // Review button handlers
   grid.querySelectorAll('.btn-review').forEach((btn) => {
-    btn.addEventListener('click', () => openReviewModal(btn.dataset.teamId, btn.dataset.teamName));
+    btn.addEventListener('click', () => {
+       if (btn.classList.contains('btn-approve') || btn.classList.contains('btn-reject')) return;
+       openReviewModal(btn.dataset.teamId, btn.dataset.teamName);
+    });
   });
 }
 
@@ -143,7 +166,8 @@ async function loadSubmissions() {
   const { data: assignments } = await supabase
     .from('mentor_assignments')
     .select('team_id')
-    .eq('mentor_id', session.mentorId);
+    .eq('mentor_id', session.mentorId)
+    .eq('status', 'Approved');
 
   const teamIds = (assignments || []).map((a) => a.team_id);
   const list = document.getElementById('submissions-list');
@@ -266,7 +290,8 @@ async function loadWeeklyReports() {
   const { data: assignments } = await supabase
     .from('mentor_assignments')
     .select('team_id')
-    .eq('mentor_id', session.mentorId);
+    .eq('mentor_id', session.mentorId)
+    .eq('status', 'Approved');
 
   const teamIds = (assignments || []).map((a) => a.team_id);
   const list = document.getElementById('weekly-reports-list');

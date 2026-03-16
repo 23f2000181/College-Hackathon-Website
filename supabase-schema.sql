@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS mentors (
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
   department TEXT NOT NULL,
-  max_teams INT DEFAULT 4,
+  max_teams INT DEFAULT 5,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -135,6 +135,7 @@ CREATE TABLE IF NOT EXISTS mentor_assignments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   mentor_id UUID REFERENCES mentors(id) ON DELETE CASCADE,
   team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected')),
   assigned_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(team_id)  -- each team gets exactly one mentor
 );
@@ -206,4 +207,24 @@ CREATE POLICY "public_select_weekly_reports" ON weekly_reports FOR SELECT USING 
 CREATE POLICY "public_insert_weekly_reports" ON weekly_reports FOR INSERT WITH CHECK (true);
 CREATE POLICY "public_update_weekly_reports" ON weekly_reports FOR UPDATE USING (true);
 CREATE POLICY "public_delete_weekly_reports" ON weekly_reports FOR DELETE USING (true);
+
+
+-- 9. Seed Mentors (Staff Details)
+-- ─────────────────────────────────────────────
+
+INSERT INTO mentors (name, email, password, department) VALUES
+  ('Dr. Narayan S', 'narayan.cse@saividya.ac.in', 'svitmentor123', 'cse'),
+  ('Prof. Rashmi S', 'rashmi.cse@saividya.ac.in', 'svitmentor123', 'cse'),
+  ('Dr. Harsha S', 'harsha.ise@saividya.ac.in', 'svitmentor123', 'ise'),
+  ('Prof. Shreeshail M', 'shreeshail.ise@saividya.ac.in', 'svitmentor123', 'ise'),
+  ('Dr. Ramesh N', 'ramesh.ece@saividya.ac.in', 'svitmentor123', 'ece'),
+  ('Prof. Geetha S', 'geetha.ece@saividya.ac.in', 'svitmentor123', 'ece'),
+  ('Dr. Mohan G', 'mohan.mech@saividya.ac.in', 'svitmentor123', 'mech'),
+  ('Prof. Kumar R', 'kumar.mech@saividya.ac.in', 'svitmentor123', 'mech'),
+  ('Dr. Sanjay K', 'sanjay.civil@saividya.ac.in', 'svitmentor123', 'civil'),
+  ('Prof. Rekha B', 'rekha.civil@saividya.ac.in', 'svitmentor123', 'civil'),
+  ('Dr. Arjun P', 'arjun.aiml@saividya.ac.in', 'svitmentor123', 'cse-aiml'),
+  ('Prof. Lakshmi V', 'lakshmi.aiml@saividya.ac.in', 'svitmentor123', 'cse-aiml'),
+  ('Dr. Vikram S', 'vikram.ds@saividya.ac.in', 'svitmentor123', 'cse-ds'),
+  ('Prof. Pooja M', 'pooja.ds@saividya.ac.in', 'svitmentor123', 'cse-ds');
 

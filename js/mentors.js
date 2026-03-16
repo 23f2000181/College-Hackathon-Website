@@ -16,6 +16,27 @@ import {
 const session = requireAuth();
 if (session) {
   initAppNav(session);
+  checkPSAndLoad();
+}
+
+async function checkPSAndLoad() {
+  const ps = await getSelectedPS(session.teamId);
+  if (!ps) {
+    const grid = document.getElementById('mentors-grid');
+    if (grid) {
+      grid.innerHTML = `
+        <div class="empty-state" style="display:block; grid-column: 1/-1; padding: 60px;">
+          <span style="font-size: 3rem; margin-bottom: 20px; display: block;">🔒</span>
+          <h3>Mentor Selection Locked</h3>
+          <p>Please select a <strong>Problem Statement</strong> first to unlock mentor selection for your department.</p>
+          <a href="/pages/problems.html" class="btn btn-primary" style="margin-top: 20px;">Browse Problems</a>
+        </div>
+      `;
+    }
+    const empty = document.getElementById('mentors-empty');
+    if (empty) empty.style.display = 'none';
+    return;
+  }
   loadMentors();
 }
 
