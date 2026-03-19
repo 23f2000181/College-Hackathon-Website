@@ -212,6 +212,27 @@
   flex-shrink: 0;
 }
 
+.roster-name-input {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border: 1px solid var(--border-card);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+  max-width: 200px;
+  margin-bottom: 4px;
+  transition: border-color 0.2s ease;
+}
+
+.roster-name-input:focus {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 0 3px rgba(255, 0, 228, 0.1);
+}
+
 .roster-usn-input {
   font-family: 'Outfit', sans-serif;
   font-size: 0.82rem;

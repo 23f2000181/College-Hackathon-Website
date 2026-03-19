@@ -134,7 +134,7 @@ if (session) {
 
   loadDashboardData();
 
-  // Team list (from session — members stored at login)
+  // Team list (fetch fresh from Supabase to ensure updated names reflect)
   const teamList = document.getElementById('team-list');
   const colors = [
     'linear-gradient(135deg, #FF00E4, #33CCFF)',
@@ -143,18 +143,39 @@ if (session) {
     'linear-gradient(135deg, #00E49F, #A855F7)',
   ];
 
-  if (session.members && teamList) {
-    session.members.forEach((name, i) => {
+  async function loadTeamMembers() {
+    if (!teamList) return;
+
+    const { data: members, error } = await supabase
+      .from('team_members')
+      .select('member_name, member_index')
+      .eq('team_id', session.teamId)
+      .order('member_index');
+
+    if (error || !members) {
+      console.error('Error fetching team members:', error);
+      return;
+    }
+
+    teamList.innerHTML = '';
+    members.forEach((m, i) => {
+      const isNull = m.member_name === 'null';
+      const displayName = isNull ? 'No Name Provided' : m.member_name;
+      const initial = (!isNull && m.member_name) ? m.member_name.charAt(0).toUpperCase() : '?';
+      const nameStyle = isNull ? 'color: var(--text-tertiary); font-style: italic;' : '';
+
       const row = document.createElement('div');
       row.className = 'team-member-row';
       row.innerHTML = `
-        <div class="member-avatar" style="background: ${colors[i]}; color: white;">${name.charAt(0).toUpperCase()}</div>
-        <span class="member-name">${name}</span>
+        <div class="member-avatar" style="background: ${colors[i]}; color: white;">${initial}</div>
+        <span class="member-name" style="${nameStyle}">${displayName}</span>
         <span class="member-badge ${i === 0 ? 'leader' : 'member'}">${i === 0 ? '★ Leader' : 'Member'}</span>
       `;
       teamList.appendChild(row);
     });
   }
+
+  loadTeamMembers();
 
   // Panel info
   const panelDept = document.getElementById('panel-dept');

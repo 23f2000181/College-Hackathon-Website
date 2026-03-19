@@ -89,11 +89,11 @@ if (session) {
       const usnDisplay = usn || '—';
 
       if (editMode && !isLeader) {
-        // Only members 2-4 can edit their USNs
+        // Only members 2-4 can edit their names and USNs
         li.innerHTML = `
           <div class="roster-avatar" style="background: ${colors[i]}; color: white;">${m.member_name.charAt(0).toUpperCase()}</div>
           <div class="roster-info">
-            <span class="roster-name">${m.member_name}</span>
+            <input type="text" class="roster-name-input" data-member-id="${m.id}" value="${m.member_name === 'null' ? '' : m.member_name}" placeholder="Enter Name" />
             <span class="roster-role">Member ${i + 1}</span>
           </div>
           <div class="roster-usn-edit">
@@ -102,9 +102,9 @@ if (session) {
         `;
       } else {
         li.innerHTML = `
-          <div class="roster-avatar" style="background: ${colors[i]}; color: white;">${m.member_name.charAt(0).toUpperCase()}</div>
+          <div class="roster-avatar" style="background: ${colors[i]}; color: white;">${(m.member_name !== 'null' && m.member_name) ? m.member_name.charAt(0).toUpperCase() : '?'}</div>
           <div class="roster-info">
-            <span class="roster-name">${m.member_name}</span>
+            <span class="roster-name" style="${m.member_name === 'null' ? 'color: var(--text-tertiary); font-style: italic;' : ''}">${m.member_name === 'null' ? 'No Name Provided' : m.member_name}</span>
             <span class="roster-role">${isLeader ? '★ Team Leader' : `Member ${i + 1}`}</span>
           </div>
           <div class="roster-usn-display">
@@ -144,28 +144,37 @@ if (session) {
   const saveBtn = document.getElementById('btn-save-roster');
   if (saveBtn) {
     saveBtn.addEventListener('click', async () => {
-      const inputs = rosterEl.querySelectorAll('.roster-usn-input');
+      const usnInputs = rosterEl.querySelectorAll('.roster-usn-input');
+      const nameInputs = rosterEl.querySelectorAll('.roster-name-input');
       let hasError = false;
 
-      for (const input of inputs) {
-        const memberId = input.dataset.memberId;
-        const newUsn = input.value.trim();
+      for (let i = 0; i < usnInputs.length; i++) {
+        const memberId = usnInputs[i].dataset.memberId;
+        const newUsn = usnInputs[i].value.trim();
+        const newName = nameInputs[i] ? nameInputs[i].value.trim() : null;
+
+        const updateData = { member_usn: newUsn };
+        if (newName) {
+          updateData.member_name = newName;
+        } else if (newName === '') {
+            updateData.member_name = 'null';
+        }
 
         const { error } = await supabase
           .from('team_members')
-          .update({ member_usn: newUsn })
+          .update(updateData)
           .eq('id', memberId);
 
         if (error) {
           hasError = true;
-          console.error('Error updating USN:', error);
+          console.error('Error updating details:', error);
         }
       }
 
       if (hasError) {
-        showTeamToast('Error updating some USNs. Please try again.', 'error');
+        showTeamToast('Error updating details. Please try again.', 'error');
       } else {
-        showTeamToast('USNs updated successfully!', 'success');
+        showTeamToast('Details updated successfully!', 'success');
         // Reload roster to reflect changes
         await loadRoster();
       }
