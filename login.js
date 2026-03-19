@@ -162,13 +162,24 @@ form.addEventListener('submit', async (e) => {
   }
 
   // Fetch team members
-  const { data: membersData } = await supabase
+  let { data: membersData, error: membersError } = await supabase
     .from('team_members')
-    .select('member_name, member_index')
+    .select('member_name, member_usn, member_index')
     .eq('team_id', team.id)
     .order('member_index');
 
+  // Fallback if member_usn column doesn't exist yet
+  if (membersError) {
+    const { data: fallback } = await supabase
+      .from('team_members')
+      .select('member_name, member_index')
+      .eq('team_id', team.id)
+      .order('member_index');
+    membersData = fallback;
+  }
+
   const members = membersData ? membersData.map((m) => m.member_name) : [];
+  const memberUsns = membersData ? membersData.map((m) => m.member_usn || '') : [];
 
   // Login success — store session info
   localStorage.setItem(
@@ -183,6 +194,7 @@ form.addEventListener('submit', async (e) => {
       usn: team.usn,
       phone: team.phone,
       members: members,
+      memberUsns: memberUsns,
       loggedInAt: new Date().toISOString(),
     })
   );

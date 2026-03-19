@@ -172,8 +172,145 @@
   line-height: 1.6;
 }
 
+/* USN display in roster */
+.roster-usn-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.roster-usn-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.roster-usn-value {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(51, 204, 255, 0.08);
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-family: monospace;
+}
+
+.roster-usn-value.missing {
+  color: var(--text-tertiary);
+  background: rgba(255, 0, 100, 0.06);
+  font-style: italic;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* USN edit input in roster */
+.roster-usn-edit {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.roster-usn-input {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  border: 1px solid var(--border-card);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text-primary);
+  outline: none;
+  width: 160px;
+  transition: border-color 0.2s ease;
+}
+
+.roster-usn-input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(51, 204, 255, 0.1);
+}
+
+/* Edit / Save / Cancel buttons */
+.btn-edit-roster {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  background: rgba(51, 204, 255, 0.08);
+  border: 1px solid rgba(51, 204, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-roster:hover {
+  background: rgba(51, 204, 255, 0.15);
+  border-color: rgba(51, 204, 255, 0.4);
+}
+
+.roster-edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.btn-save-roster {
+  padding: 8px 22px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #00E49F, #33CCFF);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-save-roster:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 228, 159, 0.25);
+}
+
+.btn-cancel-roster {
+  padding: 8px 22px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(226, 229, 236, 0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-roster:hover {
+  background: rgba(226, 229, 236, 0.6);
+}
+
 @media (max-width: 768px) {
   .team-layout {
     grid-template-columns: 1fr;
+  }
+
+  .roster-item {
+    flex-wrap: wrap;
+  }
+
+  .roster-usn-display,
+  .roster-usn-edit {
+    width: 100%;
+    margin-left: 52px;
+    margin-top: 4px;
+  }
+
+  .roster-usn-input {
+    width: 100%;
   }
 }

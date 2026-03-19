@@ -15,6 +15,9 @@ const member1Input = document.getElementById('member-1');
 const member2Input = document.getElementById('member-2');
 const member3Input = document.getElementById('member-3');
 const member4Input = document.getElementById('member-4');
+const member2UsnInput = document.getElementById('member-2-usn');
+const member3UsnInput = document.getElementById('member-3-usn');
+const member4UsnInput = document.getElementById('member-4-usn');
 const academicYearSelect = document.getElementById('academic-year');
 const teamCountEl = document.getElementById('team-count');
 const submitBtn = document.getElementById('submit-btn');
@@ -170,6 +173,23 @@ function validateForm() {
     isValid = false;
   }
 
+  // Member USNs (members 2-4 must have USNs)
+  if (!member2UsnInput.value.trim()) {
+    member2UsnInput.classList.add('error');
+    document.getElementById('team-error').classList.add('visible');
+    isValid = false;
+  }
+  if (!member3UsnInput.value.trim()) {
+    member3UsnInput.classList.add('error');
+    document.getElementById('team-error').classList.add('visible');
+    isValid = false;
+  }
+  if (!member4UsnInput.value.trim()) {
+    member4UsnInput.classList.add('error');
+    document.getElementById('team-error').classList.add('visible');
+    isValid = false;
+  }
+
   return isValid;
 }
 
@@ -253,15 +273,16 @@ form.addEventListener('submit', async (e) => {
 
   // Insert team members
   const members = [
-    member1Input.value.trim(),
-    member2Input.value.trim(),
-    member3Input.value.trim(),
-    member4Input.value.trim(),
+    { name: member1Input.value.trim(), usn: usnInput.value.trim() },
+    { name: member2Input.value.trim(), usn: member2UsnInput.value.trim() },
+    { name: member3Input.value.trim(), usn: member3UsnInput.value.trim() },
+    { name: member4Input.value.trim(), usn: member4UsnInput.value.trim() },
   ];
 
-  const memberRows = members.map((name, i) => ({
+  const memberRows = members.map((m, i) => ({
     team_id: team.id,
-    member_name: name,
+    member_name: m.name,
+    member_usn: m.usn,
     member_index: i + 1,
   }));
 
@@ -299,6 +320,9 @@ const fieldsWithErrors = [
   ['member-2', 'team-error'],
   ['member-3', 'team-error'],
   ['member-4', 'team-error'],
+  ['member-2-usn', 'team-error'],
+  ['member-3-usn', 'team-error'],
+  ['member-4-usn', 'team-error'],
 ];
 
 fieldsWithErrors.forEach(([inputId, errorId]) => {

@@ -14,6 +14,10 @@
 -- ALTER TABLE mentor_assignments
 --   ADD COLUMN IF NOT EXISTS academic_year TEXT NOT NULL DEFAULT '3rd Year'
 --     CHECK (academic_year IN ('1st Year', '2nd Year', '3rd Year', '4th Year'));
+--
+-- MIGRATION: Add member_usn column to team_members (run this in Supabase SQL Editor)
+-- ALTER TABLE team_members ADD COLUMN IF NOT EXISTS member_usn TEXT DEFAULT '';
+-- CREATE POLICY IF NOT EXISTS "public_update_members" ON team_members FOR UPDATE USING (true);
 -- ─────────────────────────────────────────────
 
 -- 1. Create Tables
@@ -37,6 +41,7 @@ CREATE TABLE IF NOT EXISTS team_members (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   team_id UUID REFERENCES teams(id) ON DELETE CASCADE,
   member_name TEXT NOT NULL,
+  member_usn TEXT DEFAULT '',
   member_index INT NOT NULL
 );
 

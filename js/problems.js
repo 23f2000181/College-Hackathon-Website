@@ -43,9 +43,14 @@ if (session) {
       topic: 'Learn Circuit Design',
       url: 'https://www.udemy.com/course/digital-circuit-design-and-implementation/',
     },
-    // CIVIL and MECH — links TBD
-    // 'civil': { topic: '...', url: '...' },
-    // 'mech': { topic: '...', url: '...' },
+    'mech': {
+      topic: 'Learn Mechanical Design',
+      url: 'https://www.udemy.com/course/design-for-mechanical-assembly-and-constraint-based-design/',
+    },
+    'civil': {
+      topic: 'Learn Structural Design',
+      url: 'https://www.udemy.com/course/design-for-mechanical-assembly-and-constraint-based-design/',
+    },
   };
 
   const prepCourse = PREP_COURSES[dept];

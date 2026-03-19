@@ -34,15 +34,26 @@ export async function getTeamData(teamId) {
 
   if (!team) return null;
 
-  const { data: members } = await supabase
+  let { data: members, error: membersError } = await supabase
     .from('team_members')
-    .select('member_name, member_index')
+    .select('member_name, member_usn, member_index')
     .eq('team_id', teamId)
     .order('member_index');
+
+  // Fallback if member_usn column doesn't exist yet
+  if (membersError) {
+    const { data: fallback } = await supabase
+      .from('team_members')
+      .select('member_name, member_index')
+      .eq('team_id', teamId)
+      .order('member_index');
+    members = fallback;
+  }
 
   return {
     ...team,
     members: members ? members.map((m) => m.member_name) : [],
+    membersWithUsn: members ? members.map((m) => ({ name: m.member_name, usn: m.member_usn || '' })) : [],
   };
 }
 
