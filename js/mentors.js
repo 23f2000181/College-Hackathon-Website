@@ -127,8 +127,8 @@ async function loadMentors() {
 
     // Calculate slot status
     const slotsUsed = mentor.assignedCount || 0;
-    const slotsTotal = 4;
-    const slotsLeft = slotsTotal - slotsUsed;
+    const slotsTotal = 2;
+    const slotsLeft = Math.max(0, slotsTotal - slotsUsed);
 
     card.innerHTML = `
       <div class="team-card-content">

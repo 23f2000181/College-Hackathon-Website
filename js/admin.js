@@ -208,10 +208,97 @@ async function renderRegistrations() {
       <td class="members-cell">${members.join(', ') || '—'}</td>
       <td class="ps-cell">${ps ? `<span class="ps-tag selected">${ps.title}</span>` : '<span class="ps-tag pending">Not selected</span>'}</td>
       <td>${formatDate(team.registered_at)}</td>
+      <td>
+        <div class="action-buttons">
+          <button class="btn-action btn-edit btn-edit-team" data-id="${team.id}" title="Edit Team">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-action btn-delete btn-delete-team" data-id="${team.id}" title="Delete Team">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          </button>
+        </div>
+      </td>
     `;
     tbody.appendChild(tr);
   });
 }
+
+// Registrations Edit & Delete Handlers
+document.getElementById('registrations-body').addEventListener('click', async (e) => {
+  const btnEdit = e.target.closest('.btn-edit-team');
+  if (btnEdit) {
+    const id = btnEdit.dataset.id;
+    const { data: teamData } = await supabase.from('teams').select('*').eq('id', id).single();
+    if (!teamData) return;
+    
+    const { data: members } = await supabase.from('team_members').select('*').eq('team_id', id).order('member_index');
+    
+    document.getElementById('edit-team-id').value = teamData.id;
+    document.getElementById('edit-team-leader').value = teamData.leader_name;
+    document.getElementById('edit-team-usn').value = teamData.usn || '';
+    document.getElementById('edit-team-email').value = teamData.email;
+    document.getElementById('edit-team-phone').value = teamData.phone || '';
+    document.getElementById('edit-team-dept').value = teamData.department;
+    document.getElementById('edit-team-year').value = teamData.academic_year || '';
+    
+    const memContainer = document.getElementById('edit-team-members');
+    memContainer.innerHTML = '';
+    (members || []).forEach(m => {
+      memContainer.innerHTML += `
+        <div class="form-row member-edit-row" data-id="${m.id}" style="margin-bottom: 8px;">
+          <input type="text" class="admin-input mem-name" value="${m.member_name}" placeholder="Member ${m.member_index} Name" />
+          <input type="text" class="admin-input mem-usn" value="${m.usn || ''}" placeholder="Member ${m.member_index} USN" />
+        </div>
+      `;
+    });
+    
+    document.getElementById('modal-edit-team').classList.add('active');
+  }
+
+  const btnDel = e.target.closest('.btn-delete-team');
+  if (btnDel) {
+    const id = btnDel.dataset.id;
+    if (!confirm('Are you sure you want to delete this team? All associated members and assignments will also be deleted.')) return;
+    
+    const { error } = await supabase.from('teams').delete().eq('id', id);
+    if (error) {
+      alert('Error deleting team: ' + error.message);
+    } else {
+      renderRegistrations();
+      renderOverview();
+    }
+  }
+});
+
+document.getElementById('btn-save-team').addEventListener('click', async () => {
+  const id = document.getElementById('edit-team-id').value;
+  const btn = document.getElementById('btn-save-team');
+  btn.textContent = 'Saving...';
+  
+  await supabase.from('teams').update({
+    leader_name: document.getElementById('edit-team-leader').value,
+    usn: document.getElementById('edit-team-usn').value,
+    email: document.getElementById('edit-team-email').value,
+    phone: document.getElementById('edit-team-phone').value,
+    department: document.getElementById('edit-team-dept').value,
+    academic_year: document.getElementById('edit-team-year').value,
+  }).eq('id', id);
+  
+  const memberRows = document.querySelectorAll('.member-edit-row');
+  for (const row of memberRows) {
+    const memId = row.dataset.id;
+    const memName = row.querySelector('.mem-name').value;
+    const memUsn = row.querySelector('.mem-usn').value;
+    await supabase.from('team_members').update({
+      member_name: memName,
+      usn: memUsn
+    }).eq('id', memId);
+  }
+  
+  btn.textContent = 'Save Changes';
+  document.getElementById('modal-edit-team').classList.remove('active');
+  renderRegistrations();
+});
 
 // ═════════════════════════════════════════
 //  PROBLEM STATEMENTS TAB
@@ -298,6 +385,9 @@ async function renderPSList() {
       <div class="ps-item-meta">
         <span class="badge ${diffBadge}">${ps.difficulty}</span>
         ${takenBy ? `<span class="ps-taken-tag">Taken by ${takenBy}</span>` : ''}
+        <button class="btn-edit-ps btn-edit-ps-item" data-id="${ps.id}" title="Edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
         <button class="btn-delete-ps" data-id="${ps.id}" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
@@ -305,6 +395,21 @@ async function renderPSList() {
     `;
 
     psList.appendChild(item);
+  });
+
+  // Edit handlers
+  psList.querySelectorAll('.btn-edit-ps-item').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const { data: ps } = await supabase.from('problem_statements').select('*').eq('id', btn.dataset.id).single();
+      if (!ps) return;
+      
+      document.getElementById('edit-ps-id').value = ps.id;
+      document.getElementById('edit-ps-title').value = ps.title;
+      document.getElementById('edit-ps-diff').value = ps.difficulty;
+      document.getElementById('edit-ps-desc').value = ps.description;
+      
+      document.getElementById('modal-edit-ps').classList.add('active');
+    });
   });
 
   // Delete handlers
@@ -323,6 +428,22 @@ async function renderPSList() {
     });
   });
 }
+
+document.getElementById('btn-save-ps').addEventListener('click', async () => {
+  const id = document.getElementById('edit-ps-id').value;
+  const btn = document.getElementById('btn-save-ps');
+  btn.textContent = 'Saving...';
+  
+  await supabase.from('problem_statements').update({
+    title: document.getElementById('edit-ps-title').value,
+    difficulty: document.getElementById('edit-ps-diff').value,
+    description: document.getElementById('edit-ps-desc').value
+  }).eq('id', id);
+  
+  btn.textContent = 'Save Changes';
+  document.getElementById('modal-edit-ps').classList.remove('active');
+  renderPSList();
+});
 
 // ═════════════════════════════════════════
 //  MENTORS TAB
@@ -404,6 +525,9 @@ async function renderMentors() {
       <div class="ps-item-meta">
         <span class="badge badge-medium">${DEPT_NAMES[m.department] || m.department}</span>
         <span class="ps-taken-tag">${assignedCount}/8 teams</span>
+        <button class="btn-edit-ps btn-edit-mentor-item" data-id="${m.id}" title="Edit">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
         <button class="btn-delete-ps" data-id="${m.id}" title="Delete">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
         </button>
@@ -411,6 +535,22 @@ async function renderMentors() {
     `;
 
     list.appendChild(item);
+  });
+
+  // Edit handlers
+  list.querySelectorAll('.btn-edit-mentor-item').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const { data: mentor } = await supabase.from('mentors').select('*').eq('id', btn.dataset.id).single();
+      if (!mentor) return;
+      
+      document.getElementById('edit-mentor-id').value = mentor.id;
+      document.getElementById('edit-mentor-name').value = mentor.name;
+      document.getElementById('edit-mentor-email').value = mentor.email;
+      document.getElementById('edit-mentor-password').value = mentor.password;
+      document.getElementById('edit-mentor-dept').value = mentor.department;
+      
+      document.getElementById('modal-edit-mentor').classList.add('active');
+    });
   });
 
   // Delete handlers
@@ -426,6 +566,23 @@ async function renderMentors() {
     });
   });
 }
+
+document.getElementById('btn-save-mentor').addEventListener('click', async () => {
+  const id = document.getElementById('edit-mentor-id').value;
+  const btn = document.getElementById('btn-save-mentor');
+  btn.textContent = 'Saving...';
+  
+  await supabase.from('mentors').update({
+    name: document.getElementById('edit-mentor-name').value,
+    email: document.getElementById('edit-mentor-email').value,
+    password: document.getElementById('edit-mentor-password').value,
+    department: document.getElementById('edit-mentor-dept').value
+  }).eq('id', id);
+  
+  btn.textContent = 'Save Changes';
+  document.getElementById('modal-edit-mentor').classList.remove('active');
+  renderMentors();
+});
 
 // ─── INIT ───
 renderOverview();

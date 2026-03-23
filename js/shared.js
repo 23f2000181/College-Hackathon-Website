@@ -182,7 +182,7 @@ export async function getMentorsByDept(dept, academicYear) {
       counts[a.mentor_id] = (counts[a.mentor_id] || 0) + 1;
     });
 
-    const cap = academicYear ? 4 : null; // null = use mentor's own max_teams
+    const cap = academicYear ? 2 : null; // null = use mentor's own max_teams
     return mentors.map((m) => ({
       ...m,
       assignedCount: counts[m.id] || 0,
@@ -219,7 +219,7 @@ export async function assignMentor(teamId, mentorId, academicYear) {
   try {
     let count = 0;
     let countError = null;
-    let maxCap = 4; // Default per-year cap
+    let maxCap = 2; // Default per-year cap
 
     if (academicYear) {
       // Per-year cap check (max 4 teams per year)

@@ -171,6 +171,7 @@
               <th>Members</th>
               <th>PS Selected</th>
               <th>Registered</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody id="registrations-body">
@@ -271,7 +272,126 @@
     </section>
   </main>
 
+  <!-- ─── MODALS ─── -->
+  <!-- Edit Team Modal -->
+  <div class="admin-modal-overlay" id="modal-edit-team">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Team</h2>
+        <button class="btn-close-modal" aria-label="Close" onclick="closeModal('modal-edit-team')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-team-id" />
+        <div class="form-row">
+          <input type="text" class="admin-input" id="edit-team-leader" placeholder="Leader Name" />
+          <input type="text" class="admin-input" id="edit-team-usn" placeholder="USN" />
+        </div>
+        <div class="form-row">
+          <input type="email" class="admin-input" id="edit-team-email" placeholder="Email" />
+          <input type="text" class="admin-input" id="edit-team-phone" placeholder="Phone" />
+        </div>
+        <div class="form-row">
+          <select class="admin-select" id="edit-team-dept" style="width: 100%;">
+            <option value="cse">CSE</option>
+            <option value="cse-aiml">CSE - AIML</option>
+            <option value="cse-ds">CSE - DS</option>
+            <option value="ise">ISE</option>
+            <option value="ece">ECE</option>
+            <option value="mech">MECH</option>
+            <option value="civil">CIVIL</option>
+          </select>
+          <input type="text" class="admin-input" id="edit-team-year" placeholder="Academic Year" />
+        </div>
+        <div class="form-heading" style="margin-top: 16px;">Team Members</div>
+        <div id="edit-team-members">
+          <!-- Filled densely via JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeModal('modal-edit-team')">Cancel</button>
+        <button class="btn-modal-save" id="btn-save-team">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit PS Modal -->
+  <div class="admin-modal-overlay" id="modal-edit-ps">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Problem Statement</h2>
+        <button class="btn-close-modal" aria-label="Close" onclick="closeModal('modal-edit-ps')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-ps-id" />
+        <div class="form-row">
+          <input type="text" class="admin-input" id="edit-ps-title" placeholder="Problem statement title..." />
+        </div>
+        <div class="form-row">
+          <select class="admin-select" id="edit-ps-diff" style="width: 100%;">
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+        </div>
+        <textarea class="admin-textarea" id="edit-ps-desc" placeholder="Brief description..." rows="4"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeModal('modal-edit-ps')">Cancel</button>
+        <button class="btn-modal-save" id="btn-save-ps">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Mentor Modal -->
+  <div class="admin-modal-overlay" id="modal-edit-mentor">
+    <div class="admin-modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Edit Mentor</h2>
+        <button class="btn-close-modal" aria-label="Close" onclick="closeModal('modal-edit-mentor')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="edit-mentor-id" />
+        <div class="form-row">
+          <input type="text" class="admin-input" id="edit-mentor-name" placeholder="Mentor full name..." />
+        </div>
+        <div class="form-row">
+          <input type="email" class="admin-input" id="edit-mentor-email" placeholder="Email address..." />
+        </div>
+        <div class="form-row">
+          <input type="text" class="admin-input" id="edit-mentor-password" placeholder="Login password..." />
+        </div>
+        <div class="form-row">
+          <select class="admin-select" id="edit-mentor-dept" style="width: 100%;">
+            <option value="cse">CSE</option>
+            <option value="cse-aiml">CSE - AIML</option>
+            <option value="cse-ds">CSE - DS</option>
+            <option value="ise">ISE</option>
+            <option value="ece">ECE</option>
+            <option value="mech">MECH</option>
+            <option value="civil">CIVIL</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeModal('modal-edit-mentor')">Cancel</button>
+        <button class="btn-modal-save" id="btn-save-mentor">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/globalNav.js"></script>
+  <script>
+    // Global function to close modals easily from HTML
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.remove('active');
+    };
+  </script>
   <script type="module" src="/js/admin.js"></script>
 </body>
 </html>

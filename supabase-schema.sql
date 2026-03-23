@@ -18,6 +18,7 @@
 -- MIGRATION: Add member_usn column to team_members (run this in Supabase SQL Editor)
 -- ALTER TABLE team_members ADD COLUMN IF NOT EXISTS member_usn TEXT DEFAULT '';
 -- CREATE POLICY IF NOT EXISTS "public_update_members" ON team_members FOR UPDATE USING (true);
+-- CREATE POLICY IF NOT EXISTS "public_delete_teams" ON teams FOR DELETE USING (true);
 -- ─────────────────────────────────────────────
 
 -- 1. Create Tables
