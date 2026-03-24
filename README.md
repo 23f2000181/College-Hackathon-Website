@@ -13,7 +13,7 @@ HackVerse is a comprehensive platform designed to streamline the management of c
 *   **Primary Actions**: Review assigned teams, approve/provide feedback on weekly progress reports, and rate final submissions.
 
 ### 3. Administrator
-*   **Account**: Master control (`admin@hackverse.com`).
+*   **Account**: Master control
 *   **Primary Actions**: Monitor all registrations, manage problem statements (add/edit/delete), register mentors, and view overall hackathon analytics.
 
 ---

@@ -23,6 +23,138 @@
 
 
 
+  <!-- REGISTRATION CLOSED OVERLAY (Remove or comment out to reopen registrations) -->
+  <style>
+    body {
+      overflow: hidden; /* Prevent scrolling behind the modal */
+    }
+    .auth-page {
+      animation: blurEffect 0.3s forwards 1.2s; /* Suddenly blurs after 1.2s */
+    }
+    
+    /* Blocks clicks immediately so form cannot be used during the reveal delay */
+    .click-blocker {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+    }
+
+    .registration-closed-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      background-color: rgba(10, 10, 10, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      animation: showOverlay 0.3s forwards 1.2s;
+    }
+
+    .closed-modal {
+      background: rgba(20, 20, 25, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(220, 38, 38, 0.2);
+      transform: scale(0.8);
+      opacity: 0;
+      animation: popupModal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards 1.3s;
+    }
+
+    .closed-icon {
+      font-size: 54px;
+      margin-bottom: 16px;
+      display: inline-block;
+      animation: shake 0.5s ease-in-out 1.8s;
+      color: #ffffff;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+    }
+
+    .closed-modal h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #ef4444, #f97316);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .closed-modal p {
+      color: #a1a1aa;
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .btn-return {
+      display: inline-block;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      text-decoration: none;
+      padding: 14px 32px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-return:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px -10px rgba(139, 92, 246, 0.6);
+    }
+
+    @keyframes blurEffect {
+      to {
+        filter: blur(8px);
+      }
+    }
+    
+    @keyframes showOverlay {
+      to {
+        opacity: 1;
+        pointer-events: all;
+      }
+    }
+
+    @keyframes popupModal {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(-10deg); }
+      40% { transform: rotate(10deg); }
+      60% { transform: rotate(-10deg); }
+      80% { transform: rotate(10deg); }
+    }
+  </style>
+
+  <div class="click-blocker"></div>
+  <div class="registration-closed-overlay">
+    <div class="closed-modal">
+      <div class="closed-icon">Oops! 🔒</div>
+      <h2>Registrations Closed!</h2>
+      <p>Thank you for your overwhelming interest in HackVerse. The deadline to register has passed and we are no longer accepting new team registrations.</p>
+      <a href="/" class="btn-return">Return to Home</a>
+    </div>
+  </div>
+  <!-- END REGISTRATION CLOSED OVERLAY -->
   <div class="auth-page">
     <!-- ─── LEFT SIDE PANEL ─── -->
     <aside class="auth-side-panel">
