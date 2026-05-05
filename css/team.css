@@ -61,6 +61,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
+  flex-wrap: nowrap;
 }
 
 .roster-item:hover {
@@ -320,14 +321,29 @@
   }
 
   .roster-item {
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .roster-avatar {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+  }
+
+  .roster-info {
+    width: 100%;
   }
 
   .roster-usn-display,
   .roster-usn-edit {
     width: 100%;
-    margin-left: 52px;
-    margin-top: 4px;
+    margin-left: 0;
+    justify-content: flex-start;
+    padding-top: 8px;
+    border-top: 1px solid rgba(26, 29, 46, 0.05);
   }
 
   .roster-usn-input {
@@ -338,7 +354,9 @@
     width: 100%;
     margin-left: 0;
     justify-content: center;
-    margin-top: 6px;
+    margin-top: 4px;
+    padding: 10px;
+    font-size: 0.85rem;
   }
 }
 
@@ -417,7 +435,5 @@
 }
 
 /* Keep the roster-item flex row consistent when button is appended */
-.roster-item {
-  flex-wrap: nowrap;
-}
+/* Removed redundant flex-wrap rule that was causing mobile issues */
 
