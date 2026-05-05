@@ -215,4 +215,34 @@ if (session) {
   }
 
   initParticles();
+
+  // ─── CERTIFICATE REMINDER POPUP ───
+  // Show once per session, with a 1.5s delay after page load
+  const CERT_DISMISSED_KEY = 'hackverse_cert_reminder_dismissed';
+  const certPopup   = document.getElementById('cert-reminder');
+  const certClose   = document.getElementById('cert-reminder-close');
+  const certGoBtn   = document.getElementById('cert-reminder-btn');
+
+  function showCertReminder() {
+    if (!certPopup || sessionStorage.getItem(CERT_DISMISSED_KEY)) return;
+    certPopup.style.display = 'flex';
+    // Force reflow then add visible class for CSS transition
+    void certPopup.offsetWidth;
+    certPopup.classList.add('visible');
+  }
+
+  function dismissCertReminder() {
+    if (!certPopup) return;
+    certPopup.classList.remove('visible');
+    sessionStorage.setItem(CERT_DISMISSED_KEY, '1');
+    // Remove from DOM after transition
+    setTimeout(() => { certPopup.style.display = 'none'; }, 400);
+  }
+
+  if (certClose) certClose.addEventListener('click', (e) => { e.stopPropagation(); dismissCertReminder(); });
+  // Dismiss automatically when user clicks Download Now (navigation handles redirect)
+  if (certGoBtn) certGoBtn.addEventListener('click', () => sessionStorage.setItem(CERT_DISMISSED_KEY, '1'));
+
+  // Show after 1.5 s
+  setTimeout(showCertReminder, 1500);
 }

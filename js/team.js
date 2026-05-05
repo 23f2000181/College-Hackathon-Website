@@ -4,6 +4,7 @@
 
 import { requireAuth, getTeamData, getSelectedPS, initAppNav, DEPT_NAMES } from '/js/shared.js';
 import { supabase } from '/js/supabase.js';
+import { jsPDF } from 'jspdf';
 
 const session = requireAuth();
 if (session) {
@@ -75,6 +76,89 @@ if (session) {
     renderRoster(false);
   }
 
+  // ─── CERTIFICATE GENERATOR ───
+  async function downloadCertificate(memberName, btnEl) {
+    if (!memberName || memberName === 'null' || memberName === 'No Name Provided') {
+      showTeamToast('Member name is missing — please edit the roster first.', 'error');
+      return;
+    }
+
+    // Show loading state on button
+    const origHTML = btnEl.innerHTML;
+    btnEl.disabled = true;
+    btnEl.innerHTML = `<span class="cert-btn-spinner"></span> Generating…`;
+
+    try {
+      await new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = '/hackversecertificate.png';
+        img.crossOrigin = 'anonymous';
+
+        img.onload = () => {
+          // Draw certificate onto canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          // ── Name overlay ──
+          // Shrink font until the name fits within 55% of the canvas width
+          const maxWidth = canvas.width * 0.55;
+          let fontSize = 52;
+          ctx.font = `bold italic ${fontSize}px "Times New Roman", Times, serif`;
+          while (ctx.measureText(memberName).width > maxWidth && fontSize > 24) {
+            fontSize -= 1;
+            ctx.font = `bold italic ${fontSize}px "Times New Roman", Times, serif`;
+          }
+
+          ctx.fillStyle = '#1a1a2e';   // deep navy — adjust if cert background differs
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          // Y: ~57% down, X: ~58% right — centres over the blank line after "Mr./Ms."
+          const nameY = Math.round(canvas.height * 0.57);
+          const nameX = Math.round(canvas.width * 0.58);
+          ctx.fillText(memberName, nameX, nameY);
+
+          // Export to PDF (landscape, pixel units matching canvas)
+          // We divide width/height by 2 to account for DPI mismatch in Chrome (96 vs 72 DPI)
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({
+            orientation: 'landscape',
+            unit: 'px',
+            format: [canvas.width / 2, canvas.height / 2],
+            hotfixes: ['px_scaling'],
+          });
+          pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2);
+
+          // Use Blob URL download — works correctly in Chrome, Edge, Firefox
+          const blob = pdf.output('blob');
+          const blobUrl = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = blobUrl;
+          anchor.download = `${memberName.replace(/\s+/g, '_')}_HackVerse_Certificate.pdf`;
+          document.body.appendChild(anchor);
+          anchor.click();
+          document.body.removeChild(anchor);
+          // Revoke after a short delay to let the browser start the download
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+          resolve();
+        };
+
+        img.onerror = () => reject(new Error('Could not load certificate image.'));
+      });
+
+      showTeamToast(`Certificate downloaded for ${memberName}!`, 'success');
+    } catch (err) {
+      console.error('Certificate generation failed:', err);
+      showTeamToast('Failed to generate certificate. Please try again.', 'error');
+    } finally {
+      btnEl.disabled = false;
+      btnEl.innerHTML = origHTML;
+    }
+  }
+
   function renderRoster(editMode) {
     rosterEl.innerHTML = '';
     isEditMode = editMode;
@@ -101,10 +185,14 @@ if (session) {
           </div>
         `;
       } else {
+        // View mode — show name, USN, and individual download button
+        const memberDisplayName = m.member_name === 'null' ? 'No Name Provided' : m.member_name;
+        const hasName = m.member_name && m.member_name !== 'null';
+
         li.innerHTML = `
-          <div class="roster-avatar" style="background: ${colors[i]}; color: white;">${(m.member_name !== 'null' && m.member_name) ? m.member_name.charAt(0).toUpperCase() : '?'}</div>
+          <div class="roster-avatar" style="background: ${colors[i]}; color: white;">${hasName ? m.member_name.charAt(0).toUpperCase() : '?'}</div>
           <div class="roster-info">
-            <span class="roster-name" style="${m.member_name === 'null' ? 'color: var(--text-tertiary); font-style: italic;' : ''}">${m.member_name === 'null' ? 'No Name Provided' : m.member_name}</span>
+            <span class="roster-name" style="${!hasName ? 'color: var(--text-tertiary); font-style: italic;' : ''}">${memberDisplayName}</span>
             <span class="roster-role">${isLeader ? '★ Team Leader' : `Member ${i + 1}`}</span>
           </div>
           <div class="roster-usn-display">
@@ -112,6 +200,21 @@ if (session) {
             <span class="roster-usn-value ${!usn ? 'missing' : ''}">${usnDisplay}</span>
           </div>
         `;
+
+        // Add individual certificate download button after the item
+        const dlBtn = document.createElement('button');
+        dlBtn.className = 'btn-download-cert';
+        dlBtn.title = `Download certificate for ${memberDisplayName}`;
+        dlBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Certificate
+        `;
+        dlBtn.addEventListener('click', () => downloadCertificate(hasName ? m.member_name : null, dlBtn));
+        li.appendChild(dlBtn);
       }
 
       rosterEl.appendChild(li);
@@ -157,7 +260,7 @@ if (session) {
         if (newName) {
           updateData.member_name = newName;
         } else if (newName === '') {
-            updateData.member_name = 'null';
+          updateData.member_name = 'null';
         }
 
         const { error } = await supabase

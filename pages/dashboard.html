@@ -202,6 +202,27 @@
 
   </main>
 
+  <!-- ─── CERTIFICATE REMINDER POPUP ─── -->
+  <div id="cert-reminder" class="cert-reminder" role="alert" aria-live="polite" style="display:none;">
+    <div class="cert-reminder-glow"></div>
+    <button class="cert-reminder-close" id="cert-reminder-close" aria-label="Dismiss">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+    <div class="cert-reminder-icon">🎓</div>
+    <div class="cert-reminder-body">
+      <p class="cert-reminder-title">Your certificates are ready!</p>
+      <p class="cert-reminder-sub">Download personalized participation certificates for every team member.</p>
+    </div>
+    <a href="/pages/team.html" class="cert-reminder-btn" id="cert-reminder-btn">
+      Download Now
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+
   <script src="/globalNav.js"></script>
   <script type="module" src="/js/dashboard.js"></script>
 </body>
